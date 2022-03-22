@@ -1,0 +1,16 @@
+{
+  // See http://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    // General markdown tools
+    "yzhang.markdown-all-in-one",
+    // Insert dates for logs
+    "jsynowiec.vscode-insertdatestring",
+    // Autocompletion for GitHub context, such as usernames with @ mentions
+    "github.vscode-pull-request-github",
+    // Paste URLs with titles
+    "capybara1.vscode-url-title-resolver",
+    // Useful to have, of course :)
+    "sourcegraph.sourcegraph"
+  ]
+}
