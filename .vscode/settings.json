@@ -2,8 +2,5 @@
   "markdownlint.config": {
     "MD034": false,
     "MD027": false
-  },
-  "files.associations": {
-    "*.snb": "markdown"
   }
 }
