@@ -31,6 +31,8 @@ Then we can scale down the current job *autoscaler* and see how what I'm plannin
 
 Continued from yesterday. Current approach pulls from our current job implementation, updates its values, and attempts to create a new job. This was an idea raised by @jhchabran and is probably the easiest way to get this started, because we can leverage the existing job. It's also nice in that you still get infra-as-code for the template as well.
 
+Started by copying over @davejrt's existing [`job-autoscaler`](https://sourcegraph.com/github.com/sourcegraph/infrastructure@fee5b7b43cc8f743e0dc8b28631267255920f6c4/-/tree/docker-images/job-autoscaler), which has some of the groundwork for getting started.
+
 Job naming must be unique? Date seems clunky. Hesistant to import dependencies, but oh well - decided to use Google's UUID package https://github.com/google/uuid
 
 Ran into some funny business:
