@@ -64,7 +64,7 @@ Cleaning up generated Kubernetes object metadata by fixing + deploying + looking
 
 Big oops detected at this point - I've threaded configuration to target a custom Buildkite queue, because I want to be able to roll this out alongside our existing jobs implementation. Querying is based on new queue, but agents are created in the old queue.
 
-Result: dozens of jobs being created, because the dispatcher thinks we aren't creating anything because its view depends on Buildkite.
+Result: [dozens of jobs being created](https://sourcegraph.slack.com/archives/CMBA8F926/p1648076224059209), because the dispatcher thinks we aren't creating anything because its view depends on Buildkite.
 
 TODOs: configure agent template to deploy in new queue. look at mitigation for this scenario. if no agents in X iterations, exit as unhealthy?
 
