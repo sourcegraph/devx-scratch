@@ -86,9 +86,14 @@ Went over my updates to https://github.com/sourcegraph/infrastructure/pull/3182 
 
 We agreed that the current approach, with Buildkite as agent count source-of-truth (as opposed to Kubernetes), is fine despite overscaling tendencies.
 
-Applied manifest changes in https://github.com/sourcegraph/infrastructure/pull/3182 and merged https://github.com/sourcegraph/sourcegraph/pull/33107 to switch the 10% stateless rollout to target the new dispatched agents to monitor.
+Applied manifest changes in https://github.com/sourcegraph/infrastructure/pull/3182 and merged https://github.com/sourcegraph/sourcegraph/pull/33107 to switch the 10% stateless rollout to target the new dispatched agents to monitor. See PRs for links to observability.
 
-I've also updated links to monitor this:
+After monitoring for half a day, some changes:
 
-- [Dispatcher logs](https://cloudlogging.app.goo.gl/pqcDLz9aeFCDtWTU9)
-- [Dispatched agents](https://console.cloud.google.com/kubernetes/workload/overview?project=sourcegraph-ci&pageState=(%22savedViews%22:(%22i%22:%22d63788ab9603422da3abba5f06030393%22,%22c%22:%5B%5D,%22n%22:%5B%22buildkite%22%5D),%22workload_list_table%22:(%22f%22:%22%255B%257B_22k_22_3A_22Is%2520system%2520object_22_2C_22t_22_3A11_2C_22v_22_3A_22_5C_22False_~*false_5C_22_22_2C_22i_22_3A_22is_system_22%257D_2C%257B_22k_22_3A_22Name_22_2C_22t_22_3A10_2C_22v_22_3A_22_5C_22buildkite-agent-stateless-_5C_22_22_2C_22i_22_3A_22metadata%252Fname_22%257D%255D%22)))
+- bumped down dispatch interval, increased buffer - scale-up wasn't happening fast enough
+- more Buildkite API woes - updated the scheduled jobs query to work properly. [feedback thread](https://sourcegraph.slack.com/archives/C02RH06NMH6/p1648238136391329)
+- more aggressive scale-down strategy by setting `ActiveDeadlineSeconds`:
+  - if scaling up to around buffer count, set a long deadline (potential quite period)
+  - otherwise set a short deadline
+
+The [logs-based metrics](https://console.cloud.google.com/logs/metrics?folder=true&organizationId=true&project=sourcegraph-ci) + [dashboards](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?folder=true&organizationId=true&project=sourcegraph-ci&dashboardBuilderState=%257B%2522editModeEnabled%2522:false%257D&timeDomain=1h) + ability to trace a dispatched set of agents back to the logs using the dispatch ID works together quite nicely!
