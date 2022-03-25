@@ -81,6 +81,7 @@ Went over my updates to https://github.com/sourcegraph/infrastructure/pull/3182 
 1. Buildkite API being nonfunctional - metadata query is unreliable, so we resort to plain search now. [@davejrt](https://github.com/sourcegraph/infrastructure/pull/3182#discussion_r835246040) noted might be related to only one `queue` being made queryable at a time.
 2. Migation for jobs taking some time to start up: expect percentage of previous batch to deploy + padding agent counts with `ROLLOUT_CONSEQUENT`
 3. Created fork of https://github.com/ericchiang/k8s to fix [Job TTL after done not being available](https://github.com/sourcegraph/infrastructure/pull/3182#issuecomment-1078544735): https://github.com/sourcegraph/k8s
+   1. This removes the need for [the protobuf `replace` workaround from the other day](#2022-03-23)
 4. Fixed issue with [yarn cache not working](https://github.com/sourcegraph/infrastructure/pull/3182#issuecomment-1078668892) - the caching mechanism was toggled on the `job` queue name. See https://github.com/sourcegraph/sourcegraph/pull/33107
 
 We agreed that the current approach, with Buildkite as agent count source-of-truth (as opposed to Kubernetes), is fine despite overscaling tendencies.
