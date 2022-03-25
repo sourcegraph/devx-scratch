@@ -43,7 +43,7 @@ Running tool: /usr/local/bin/go test -timeout 30s -run ^Test_computeJobConfig$ g
 panic: mismatching message name: got k8s.io.kubernetes.pkg.watch.versioned.Event, want github.com/ericchiang.k8s.watch.versioned.Event
 ```
 
-Looks like github.com/ericchiang/k8s is deprecated? Tried using the official client, but it doesn't seem to provide a struct type for `Job`. Ended up with a workaround:
+Looks like https://github.com/ericchiang/k8s is deprecated? Tried using the official client, but it doesn't seem to provide a struct type for `Job`. Ended up with a workaround:
 
 ```go
 // Transient dependency incompatability, similar to https://stackoverflow.com/questions/61251129/how-to-fix-conflicts-with-this-error-message
@@ -71,3 +71,23 @@ Result: [dozens of jobs being created](https://sourcegraph.slack.com/archives/CM
 TODOs: configure agent template to deploy in new queue. look at mitigation for this scenario. if no agents in X iterations, exit as unhealthy?
 
 Draft PR: https://github.com/sourcegraph/infrastructure/pull/3182
+
+## 2022-03-25
+
+@bobheadxi @davejrt @jhchabran
+
+Went over my updates to https://github.com/sourcegraph/infrastructure/pull/3182 yesterday:
+
+1. Buildkite API being nonfunctional - metadata query is unreliable, so we resort to plain search now. [@davejrt](https://github.com/sourcegraph/infrastructure/pull/3182#discussion_r835246040) noted might be related to only one `queue` being made queryable at a time.
+2. Migation for jobs taking some time to start up: expect percentage of previous batch to deploy + padding agent counts with `ROLLOUT_CONSEQUENT`
+3. Created fork of https://github.com/ericchiang/k8s to fix [Job TTL after done not being available](https://github.com/sourcegraph/infrastructure/pull/3182#issuecomment-1078544735): https://github.com/sourcegraph/k8s
+4. Fixed issue with [yarn cache not working](https://github.com/sourcegraph/infrastructure/pull/3182#issuecomment-1078668892) - the caching mechanism was toggled on the `job` queue name. See https://github.com/sourcegraph/sourcegraph/pull/33107
+
+We agreed that the current approach, with Buildkite as agent count source-of-truth (as opposed to Kubernetes), is fine despite overscaling tendencies.
+
+Applied manifest changes in https://github.com/sourcegraph/infrastructure/pull/3182 and merged https://github.com/sourcegraph/sourcegraph/pull/33107 to switch the 10% stateless rollout to target the new dispatched agents to monitor.
+
+I've also updated links to monitor this:
+
+- [Dispatcher logs](https://cloudlogging.app.goo.gl/pqcDLz9aeFCDtWTU9)
+- [Dispatched agents](https://console.cloud.google.com/kubernetes/workload/overview?project=sourcegraph-ci&pageState=(%22savedViews%22:(%22i%22:%22d63788ab9603422da3abba5f06030393%22,%22c%22:%5B%5D,%22n%22:%5B%22buildkite%22%5D),%22workload_list_table%22:(%22f%22:%22%255B%257B_22k_22_3A_22Is%2520system%2520object_22_2C_22t_22_3A11_2C_22v_22_3A_22_5C_22False_~*false_5C_22_22_2C_22i_22_3A_22is_system_22%257D_2C%257B_22k_22_3A_22Name_22_2C_22t_22_3A10_2C_22v_22_3A_22_5C_22buildkite-agent-stateless-_5C_22_22_2C_22i_22_3A_22metadata%252Fname_22%257D%255D%22)))
