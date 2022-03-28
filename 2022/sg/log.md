@@ -18,5 +18,5 @@ Idea brought up [Scratchpad - Improving engineering onboarding: tooling](https:/
 
 @jhchabran
 
-I merged the PR that replace the updates with a download of the prebuilt binary.
+I merged the PR that replace the updates with a download of the prebuilt binary. https://github.com/sourcegraph/sourcegraph/pull/33132
 
