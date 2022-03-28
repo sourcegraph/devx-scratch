@@ -9,7 +9,7 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 It was reported that `sg` was stuck in an autoupdate loop. This was caused by
 the fact that the user had two `sg` installed: one under `~/.sg/sg` and the other one in the `$GOBIN` folder. Because the detection is based on what's in the repository, the result was an infinite loop. 
   
-My hunch here is that we should just pick one, and always stick to that install location. I asked Thorsten his thoughts [here](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1648468340459119?thread_ts=1648467054.249209&cid=C01N83PS4TU)
+My hunch here is that we should just pick one, and always stick to that install location. I asked Thorsten his thoughts [here.](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1648468340459119?thread_ts=1648467054.249209&cid=C01N83PS4TU)
 
 ## 2022-03-21
 
