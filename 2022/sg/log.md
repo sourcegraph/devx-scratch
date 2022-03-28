@@ -13,3 +13,10 @@ Idea brought up [Scratchpad - Improving engineering onboarding: tooling](https:/
 - added one for `sg ci` (https://github.com/sourcegraph/sourcegraph/pull/32857)
 - we don’t have `sg monitoring` yet, and we don’t even know if we will continue using Grafana going forward
 - not much else to add?
+
+## 2022-03-28
+
+@jhchabran
+
+I merged the PR that replace the updates with a download of the prebuilt binary.
+
