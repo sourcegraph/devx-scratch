@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry.
 
+## 2022-03-29
+
+@davejrt, @bobheadxi, @jhchabran
+
+- `depguard` issues on both stateful and stateless agents with more frequency that is now becoming more disruptive. Initial investigation hasn't come up with anything definitive so for the moment, the tests have been disabled [here](https://github.com/sourcegraph/sourcegraph/pull/33182) and an [issue created](https://github.com/sourcegraph/sourcegraph/issues/33183)
+
 ## 2022-03-28
 
 @jhchabran
@@ -10,26 +16,6 @@ It was reported that `sg` was stuck in an autoupdate loop. This was caused by
 the fact that the user had two `sg` installed: one under `~/.sg/sg` and the other one in the `$GOBIN` folder. Because the detection is based on what's in the repository, the result was an infinite loop. 
   
 My hunch here is that we should just pick one, and always stick to that install location. I asked Thorsten his thoughts [here.](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1648468340459119?thread_ts=1648467054.249209&cid=C01N83PS4TU)
-
-## 2022-03-21
-
-@bobheadxi, @jhchabran
-
-We have been running into sporadic, severe issues with stateless agent availability since we [rolled out stateless builds to 75% of `sourcegraph/sourcegraph` builds](https://github.com/sourcegraph/sourcegraph/pull/32751). See [thread](https://sourcegraph.slack.com/archives/C02MWRMAFR8/p1647838869486089). Caused some severe downtime in the morning, with [incident 92](https://app.incident.io/incidents/92)
-
-- Increased `backoffLimit` to max: https://github.com/sourcegraph/infrastructure/pull/3176
-- Discussed autoscaling implementation, landed on some misunderstandings: https://github.com/sourcegraph/infrastructure/pull/3177
-- Scaled down agent rollout top 10%: https://github.com/sourcegraph/sourcegraph/pull/32840
-
-Follow-up: potential revamp of autoscaler. https://github.com/sourcegraph/sourcegraph/issues/32843
-
-## 2022-03-22
-
-@bobheadxi
-
-- Node installation failures in deploy-sourcegraph-cloud pipeline [thread](https://sourcegraph.slack.com/archives/C02KX975BDG/p1647971014157899?thread_ts=1647957942.367989&cid=C02KX975BDG)
-  - Might be caused by really old Node version in the pipeline, or just plain bad state. Doesn't seem to be happening on the sourcegraph pipeline
-  - @daxmc99 deletes a bunch of stuff propagated from upstream depoy-sourcegraph, as well as the prettier step entirely: https://github.com/sourcegraph/deploy-sourcegraph-cloud/pull/15935
 
 ## 2022-03-25
 
@@ -51,3 +37,23 @@ Also note deployment of the new stateless job dispatcher. Links to monitor:
 To roll back, revert https://github.com/sourcegraph/sourcegraph/pull/33107 or change the queue to target `stateless` instead of `stateless2`. Configuration changes are in https://github.com/sourcegraph/infrastructure/pull/3182
 
 Most things can be traced using the dispatched ID, which is included in the job name, agent metadata, and log fields - e.g. to trace down why the dispatcher decided to make a dispatch.
+
+## 2022-03-22
+
+@bobheadxi
+
+- Node installation failures in deploy-sourcegraph-cloud pipeline [thread](https://sourcegraph.slack.com/archives/C02KX975BDG/p1647971014157899?thread_ts=1647957942.367989&cid=C02KX975BDG)
+  - Might be caused by really old Node version in the pipeline, or just plain bad state. Doesn't seem to be happening on the sourcegraph pipeline
+  - @daxmc99 deletes a bunch of stuff propagated from upstream depoy-sourcegraph, as well as the prettier step entirely: https://github.com/sourcegraph/deploy-sourcegraph-cloud/pull/15935
+
+## 2022-03-21
+
+@bobheadxi, @jhchabran
+
+We have been running into sporadic, severe issues with stateless agent availability since we [rolled out stateless builds to 75% of `sourcegraph/sourcegraph` builds](https://github.com/sourcegraph/sourcegraph/pull/32751). See [thread](https://sourcegraph.slack.com/archives/C02MWRMAFR8/p1647838869486089). Caused some severe downtime in the morning, with [incident 92](https://app.incident.io/incidents/92)
+
+- Increased `backoffLimit` to max: https://github.com/sourcegraph/infrastructure/pull/3176
+- Discussed autoscaling implementation, landed on some misunderstandings: https://github.com/sourcegraph/infrastructure/pull/3177
+- Scaled down agent rollout top 10%: https://github.com/sourcegraph/sourcegraph/pull/32840
+
+Follow-up: potential revamp of autoscaler. https://github.com/sourcegraph/sourcegraph/issues/32843
