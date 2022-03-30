@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, this log should be in reverse chronological order, with the most recent entry at the top. 
 
+## 2022-03-30
+
+@davejrt, @bobheadxi, @jhchabran
+
+[This](https://github.com/sourcegraph/infrastructure/pull/3191) PR caused a small outage when we didn't merge in the correct order, and part of the core job was overwritten by the CI on the infrastructure repo. We had to do some juggling between stateless agent rollout, and merging this PR to unblock a large queue of other jobs that accumulated whilst stateless agents wouldn't start. 
+
 ## 2022-03-29
 
 @davejrt, @bobheadxi, @jhchabran
