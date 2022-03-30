@@ -97,3 +97,20 @@ After monitoring for half a day, some changes:
   - otherwise set a short deadline
 
 The [logs-based metrics](https://console.cloud.google.com/logs/metrics?folder=true&organizationId=true&project=sourcegraph-ci) + [dashboards](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?folder=true&organizationId=true&project=sourcegraph-ci&dashboardBuilderState=%257B%2522editModeEnabled%2522:false%257D&timeDomain=1h) + ability to trace a dispatched set of agents back to the logs using the dispatch ID works together quite nicely!
+
+## 2022-03-30
+
+@bobheadxi, @jhchabran, @davejrt
+
+Finalized rollout of stateless agents:
+
+- [x] https://github.com/sourcegraph/infrastructure/pull/3188
+- [x] https://github.com/sourcegraph/sourcegraph/pull/33186 (for `sourcegraph/sourcegraph`)
+- [x] https://github.com/sourcegraph/sourcegraph/pull/33226
+- [x] https://github.com/sourcegraph/infrastructure/pull/3192
+
+Some stateful agents are still running, but the Kubernetes manifests have been removed and we can spin them down after a while.
+
+Ran into some hiccups, but otherwise looks good - for more details see [the support log](../support/log.md#2022-03-30)
+
+The dispatcher is keyed on `queue: stateless`. We might want to migrate [references to `queue: job`](https://sourcegraph.com/search?q=context:%40sourcegraph/all+queue:+job+lang:yaml&patternType=literal) eventually. If we ever switch back to the `standard` queue, we'll want to update all references as well. Rename is required to make the pending builds detection work correctly.
