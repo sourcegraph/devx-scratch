@@ -1,12 +1,6 @@
 # 2022 stateless agents
 
-https://github.com/sourcegraph/sourcegraph/issues/30233
-
-## 2022-03-31
-
-@jhchabran 
-
-The slack token used on CI seems to have some issues, [see this buildkite notification](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1648722027703459). It was missing from the stateless agents manifest. As I was alone, I self merged on this one and applied the changes. $DURATION=10m
+Notes on https://github.com/sourcegraph/sourcegraph/issues/30233. **This log should be in chronological order.**
 
 ## 2022-03-22
 
@@ -120,3 +114,9 @@ Some stateful agents are still running, but the Kubernetes manifests have been r
 Ran into some hiccups, but otherwise looks good - for more details see [the support log](../support/log.md#2022-03-30)
 
 The dispatcher is keyed on `queue: stateless`. We might want to migrate [references to `queue: job`](https://sourcegraph.com/search?q=context:%40sourcegraph/all+queue:+job+lang:yaml&patternType=literal) eventually. If we ever switch back to the `standard` queue, we'll want to update all references as well. Rename is required to make the pending builds detection work correctly. [#33238](https://github.com/sourcegraph/sourcegraph/issues/33238)
+
+## 2022-03-31
+
+@jhchabran
+
+The slack token used on CI seems to have some issues, [see this buildkite notification](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1648722027703459). It was missing from the stateless agents manifest. As I was alone, I self merged on this one and applied the changes. $DURATION=10m
