@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, this log should be in reverse chronological order, with the most recent entry at the top. 
 
+## 2022-03-31
+
+@jhchabran 
+
+Spotted this [exception](https://github.com/sourcegraph/sec-pr-audit-trail/issues/144) that should not exist as the base branch is not `main`. Led to create [this bug report](https://github.com/sourcegraph/sourcegraph/issues/33275). $DURATION=5m
+
 ## 2022-03-30
 
 @davejrt, @bobheadxi, @jhchabran

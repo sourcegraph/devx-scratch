@@ -2,6 +2,12 @@
 
 https://github.com/sourcegraph/sourcegraph/issues/30233
 
+## 2022-03-31
+
+@jhchabran 
+
+The slack token used on CI seems to have some issues, [see this buildkite notification](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1648722027703459). It was missing from the stateless agents manifest. As I was alone, I self merged on this one and applied the changes. $DURATION=10m
+
 ## 2022-03-22
 
 @bobheadxi
