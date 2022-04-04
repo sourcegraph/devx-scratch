@@ -131,7 +131,7 @@ We paired today to investigate recent occurences on the alert @bobheadxi set up 
   - PR: [infrastructure#3200](https://github.com/sourcegraph/infrastructure/pull/3200)
 - @davejrt noted that anecdotally he sees many occurences of us hitting our resource quotas for the `sourcegraph-ci` project.
   - Confirmed in the [GCP quotas page](https://console.cloud.google.com/iam-admin/quotas?referrer=search&project=sourcegraph-ci) (notably `N2D CPUs` and `Local SSD (GB)` quotas in the `us-central-1` region)
-  - We are not over-provisioning - at least some CI jobs make full use of the machines. We [added a panel to the GCP dashboard for `buildkite-job-dispatcher`](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?project=sourcegraph-ci) that CPU utilization can regularly hit 100%.
+  - We are not over-provisioning - at least some CI jobs make full use of the machines. We [added a panel to the GCP dashboard for `buildkite-job-dispatcher`](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?project=sourcegraph-ci) that shows CPU utilization can regularly hit 100%.
   - @davejrt to investigate simplifying our node pools. The next step could be to introduce separate queues that use node pools of differently sized machines to process jobs of varying intensity.
 
 We will continue observing after merging [infrastructure#3200](https://github.com/sourcegraph/infrastructure/pull/3200)
