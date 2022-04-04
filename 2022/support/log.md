@@ -2,6 +2,28 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-04
+
+@bobheadxi
+
+Spotted two flakes. Didn't do anything except note their occurrence.
+
+[build 140335](https://buildkite.com/sourcegraph/sourcegraph/builds/140335#803f8727-c5c0-484d-80fe-96f5b1f3c45f/181-2772), isolated occurrence according to [grafana query](https://sourcegraph.grafana.net/goto/7494m3snz?orgId=1).
+
+```none
+START| IndexStatus
+     |     dbtest.go:111: testdb: postgres://postgres:sourcegraph@127.0.0.1:5432/sourcegraph-test-3601185618347116340?sslmode=disable&timezone=UTC
+     |     store_test.go:524: expected index status
+     |     dbtest.go:121: DATABASE sourcegraph-test-3601185618347116340 left intact for inspection
+FAIL | IndexStatus (2.04s)
+```
+
+[build 140327](https://buildkite.com/sourcegraph/sourcegraph/builds/140327#70b8c0bd-a53c-48e5-a90c-0a3ec2bf704e/216-294), nothing we can do here.
+
+```none
+error An unexpected error occurred: "https://registry.npmjs.org/@xstate/fsm/-/fsm-1.4.0.tgz: Request failed \"522 undefined\"".
+```
+
 ## 2022-04-01
 
 @bobheadxi
