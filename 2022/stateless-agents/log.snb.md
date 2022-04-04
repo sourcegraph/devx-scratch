@@ -120,3 +120,18 @@ The dispatcher is keyed on `queue: stateless`. We might want to migrate [referen
 @jhchabran
 
 The slack token used on CI seems to have some issues, [see this buildkite notification](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1648722027703459). It was missing from the stateless agents manifest. As I was alone, I self merged on this one and applied the changes. $DURATION=10m
+
+## 2022-04-04
+
+@bobheadxi, @davejrt
+
+We paired today to investigate recent occurences on the alert @bobheadxi set up for `secondsWaitedForExpectedDispatch`. Findings:
+
+- Right now we fetch the expected (previous) agent dispatch state from Buildkite, where we count agents with the corresponding dispatch ID and wait for a percentage of the expected agents to roll out. However, agents can be "consumed" (finish running their jobs) before (or while) the job dispatcher waits for the expected dispatch to roll out. This is indicated [in the metrics](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?project=sourcegraph-ci), where the total agents count drop drastically before the expected dispatch has reached the required threshold, likely due to the agents being consumed quickly by short jobs. To mitigate this, we should change the source-of-truth of expected dispatches from Buildkite to Kubernetes, where we can get a more accurate picture by looking at the state of the Job resource.
+  - PR: [infrastructure#3200](https://github.com/sourcegraph/infrastructure/pull/3200)
+- @davejrt noted that anecdotally he sees many occurences of us hitting our resource quotas for the `sourcegraph-ci` project.
+  - Confirmed in the [GCP quotas page](https://console.cloud.google.com/iam-admin/quotas?referrer=search&project=sourcegraph-ci) (notably `N2D CPUs` and `Local SSD (GB)` quotas in the `us-central-1` region)
+  - We are not over-provisioning - at least some CI jobs make full use of the machines. We [added a panel to the GCP dashboard for `buildkite-job-dispatcher`](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?project=sourcegraph-ci) that CPU utilization can regularly hit 100%.
+  - @davejrt to investigate simplifying our node pools. The next step could be to introduce separate queues that use node pools of differently sized machines to process jobs of varying intensity.
+
+We will continue observing after merging [infrastructure#3200](https://github.com/sourcegraph/infrastructure/pull/3200)
