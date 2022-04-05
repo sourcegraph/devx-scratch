@@ -2,6 +2,19 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-05
+
+@bobheadxi
+
+CI incident raised due to:
+
+- Checkov checks breaking (dependency not found)
+- Pupetteer finalize flaking
+- Newly introduced Pupetter check flaking (chrome extension)
+- npm install flake (503)
+
+@bobheadxi mostly reading logs and pinging teams and asking he flakey steps be disabled. Nothing we can do about the infra flake for now, though [#26257](https://github.com/sourcegraph/sourcegraph/issues/26257) could mitigate. $DURATION=30m
+
 ## 2022-04-04
 
 @bobheadxi
@@ -23,6 +36,10 @@ FAIL | IndexStatus (2.04s)
 ```none
 error An unexpected error occurred: "https://registry.npmjs.org/@xstate/fsm/-/fsm-1.4.0.tgz: Request failed \"522 undefined\"".
 ```
+
+Responded to a couple of requests in #dev-experience, mostly surrounding check output and splitting steps so that the checks they run are more granular (most notably prettier, yarn). https://github.com/sourcegraph/sourcegraph/issues/33363 $DURATION=10m
+
+Not part of devx-support, but @bobheadxi investigated the `prom-wrapper` alerting configuration issue raised in [INC-93](https://app.incident.io/incidents/93) ([writeup](https://github.com/sourcegraph/sourcegraph/issues/33394)) with the help of @michaellzc, the root cause of which turned out to be some [DevX work to refactor the `conf` package's `init` behaviour](https://github.com/sourcegraph/sourcegraph/issues/29222). The fix: https://github.com/sourcegraph/sourcegraph/pull/33398 , Delivery is doing the remainder of the investigation and follow-up. $DURATION=90m
 
 ## 2022-04-01
 
