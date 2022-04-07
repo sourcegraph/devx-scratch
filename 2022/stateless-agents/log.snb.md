@@ -132,6 +132,47 @@ We paired today to investigate recent occurences on the alert @bobheadxi set up 
 - @davejrt noted that anecdotally he sees many occurences of us hitting our resource quotas for the `sourcegraph-ci` project.
   - Confirmed in the [GCP quotas page](https://console.cloud.google.com/iam-admin/quotas?referrer=search&project=sourcegraph-ci) (notably `N2D CPUs` and `Local SSD (GB)` quotas in the `us-central-1` region)
   - We are not over-provisioning - at least some CI jobs make full use of the machines. We [added a panel to the GCP dashboard for `buildkite-job-dispatcher`](https://console.cloud.google.com/monitoring/dashboards/builder/a87f3cbb-4d73-476d-8736-f3bc1ca9f234?project=sourcegraph-ci) that shows CPU utilization can regularly hit 100%.
-  - @davejrt to investigate simplifying our node pools. The next step could be to introduce separate queues that use node pools of differently sized machines to process jobs of varying intensity. See [issue #33390](https://github.com/sourcegraph/sourcegraph/issues/33390) for further investigation 
+  - @davejrt to investigate simplifying our node pools. The next step could be to introduce separate queues that use node pools of differently sized machines to process jobs of varying intensity. See [issue #33390](https://github.com/sourcegraph/sourcegraph/issues/33390) for further investigation
 
 We will continue observing after merging [infrastructure#3200](https://github.com/sourcegraph/infrastructure/pull/3200)
+
+## 2022-04-06 repository clone optimization
+
+@bobheadxi @davejrt
+
+Issue: https://github.com/sourcegraph/sourcegraph/issues/30237
+
+Shared volume that houses [reference repositories](https://randyfay.com/content/reference-cache-repositories-speed-clones-git-clone-reference)
+
+- create GCP volume with cloned repos (`gcloud create disk ...`)
+- create new PersistentVolume with new disk
+- create new PersistentVolumeClaim with new PersistentVolume
+- create new jobs going forward with volume mount referencing previously created PV/PVC
+- safely delete old PV/PVCs once no Jobs are using them anymore (method TBD)
+
+```none
+git clone --mirror $REPO ~/buildkite-git-references/${org}/${name}.reference
+```
+
+Quick local test of using mirror and reference:
+
+```bash
+export GIT_URL=git@github.com:sourcegraph/infrastructure.git 
+export GIT_REFERENCE=~/buildkite-git-references/infrastructure.reference
+git clone "$GIT_URL" --mirror "$GIT_REFERENCE"
+git -C "$GIT_REFERENCE" rev-parse --git-dir # check if is a git repo
+git clone --reference "$GIT_REFERENCE" "$GIT_URL" /tmp/infrastructure # happens pretty fast
+ls /tmp/infrastructure
+```
+
+First step could be to create try and create this volume manually. We can then spin up a new `buildkite-job-dispatcher` managing a new queue that attaches this volume for testing.
+
+```sh
+gcloud --project=sourcegraph-ci compute disks create buildkite-git-references \
+  --zone=us-central1-c --size=32GB --type=pd-standard
+# cleanup: gcloud --project=sourcegraph-ci compute disks delete buildkite-git-references --zone=us-central1-c
+```
+
+How to easily populate this disk, however, with reference repositories? We could create a VM and attach this disk to set it up, but at a glance [this does not look super trivial](https://cloud.google.com/compute/docs/disks/add-persistent-disk). Might be easier to set this up with a Job. Could set up a pipeline on a cron that does the steps outlined above.
+
+Draft work: https://github.com/sourcegraph/infrastructure/commit/ccaab7100a077a3fef31e941e226be1048cffd90
