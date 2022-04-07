@@ -12,6 +12,8 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 Agent on `default` queue [stuck for 14 minutes](https://sourcegraph.slack.com/archives/C02KX975BDG/p1649253119257889?thread_ts=1649252899.879369&cid=C02KX975BDG). Fix: add a configurable secondary queue to job dispatcher, which is used to look for scheduled jobs, and set `queue=default` [infrastructure#3208](https://github.com/sourcegraph/infrastructure/pull/3208) $DURATION=30m
 
+[Discussion about `queue` usage](https://sourcegraph.slack.com/archives/C07KZF47K/p1649272455134259?thread_ts=1648590958.956749&cid=C07KZF47K). Follow-ups: [create pipeline creation guide](https://github.com/sourcegraph/handbook/issues/2993), [revert `job` and `stateless` queues to `standard`](https://github.com/sourcegraph/sourcegraph/issues/33238#issuecomment-1090779452)
+
 ## 2022-04-05
 
 @bobheadxi
