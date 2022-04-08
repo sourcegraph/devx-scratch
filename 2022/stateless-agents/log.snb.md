@@ -121,7 +121,7 @@ The dispatcher is keyed on `queue: stateless`. We might want to migrate [referen
 
 The slack token used on CI seems to have some issues, [see this buildkite notification](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1648722027703459). It was missing from the stateless agents manifest. As I was alone, I self merged on this one and applied the changes. $DURATION=10m
 
-## 2022-04-04
+## 2022-04-04 `secondsWaitedForExpectedDispatch`
 
 @bobheadxi, @davejrt
 
@@ -190,3 +190,12 @@ In this approach:
 2. `buildkite-job-dispatcher` now fetches `buildkite-git-references-$ID` PVCs labelled `state: ready`, and if available gets the PVC with the highest-indexed ID and attaches it to dispatched agents as `readOnly`.
 3. Create a new image, `buildkite-agent-stateless`, that includes a new `checkout` hook that checks the mounted `/buildkite-git-references` before executing a clone.
    1. This is a separate image because we forgo a lot of the setup in Buildkite's default checkout hook, since we know we are always using a fresh agent. This assumption does not hold on the remaining stateful agents (`baremetal`)
+
+Upon rollout, ran into a variety of issues:
+
+- Custom checkout script was bugged - Buildkite hides a lot of functionality within its default checkout script (which is [written in Go](https://sourcegraph.com/github.com/buildkite/agent@f89af110e08f59f68520b30edc3e46faf7fd966e/-/blob/bootstrap/bootstrap.go?L1277), so not that straight-forward to copy/paste)
+  - Fix: https://github.com/sourcegraph/infrastructure/commit/bc9762abd4dd6f630d327b224ab35c5d48268fcb
+- [Previous change to `expectedDispatch` checking](#2022-04-04-secondswaitedforexpecteddispatch) was unable to account for node errors, e.g. `unschedulable` nodes, leading to endless deploys as the dispatcher thinks agents are online when they are not.
+  - Fix: [list pods with dispatch label](https://github.com/sourcegraph/infrastructure/commit/4d7ce3cecd962d962cc274d9d079e12d097c6b8e)
+- Deleting PVCs while agents are still rolling out leads to unschedulable nodes, since nodes can't bind to PVCs that are marked for deletion.
+  - Fix: [expire PVCs with label, delete only when unused](https://github.com/sourcegraph/infrastructure/commit/48fefd121a43b44658671f24ac0d09c01db482ce)
