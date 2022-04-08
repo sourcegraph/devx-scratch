@@ -176,3 +176,17 @@ gcloud --project=sourcegraph-ci compute disks create buildkite-git-references \
 How to easily populate this disk, however, with reference repositories? We could create a VM and attach this disk to set it up, but at a glance [this does not look super trivial](https://cloud.google.com/compute/docs/disks/add-persistent-disk). Might be easier to set this up with a Job. Could set up a pipeline on a cron that does the steps outlined above.
 
 Draft work: https://github.com/sourcegraph/infrastructure/commit/ccaab7100a077a3fef31e941e226be1048cffd90
+
+## 2022-04-08 repository clone optimization
+
+End-to-end working implementation: https://github.com/sourcegraph/infrastructure/pull/3212
+
+In this approach:
+
+1. A pipeline marks PVCs for deletion, creates a new disk, creates a PV and PVC for the diskj, creates a job that attaches to the disk to populate it, and then sets a `state: ready` label on the PVC.
+   1. Marking a PVC for deletion using `kubectl delete` will only execute the delete once all resources attached to the PVC have released it (in this case, when agents inevitably get used or expire).
+   2. PVCs with `persistentVolumeReclaimPolicy: Delete` will delete the underlying PV and disk resource when deleted.
+   3. We can set multiple `accessModes` on the created PV and PVC - in this case, we allow both `ReadWriteOnce` and `ReadOnlyMany`. The populate job uses `ReadWriteOnce`, and once it is done we mark the PVC as `state: ready`, at which point new agent jobs can mount the volume as read-only.
+2. `buildkite-job-dispatcher` now fetches `buildkite-git-references-$ID` PVCs labelled `state: ready`, and if available gets the PVC with the highest-indexed ID and attaches it to dispatched agents as `readOnly`.
+3. Create a new image, `buildkite-agent-stateless`, that includes a new `checkout` hook that checks the mounted `/buildkite-git-references` before executing a clone.
+   1. This is a separate image because we forgo a lot of the setup in Buildkite's default checkout hook, since we know we are always using a fresh agent. This assumption does not hold on the remaining stateful agents (`baremetal`)
