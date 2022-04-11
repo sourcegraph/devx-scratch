@@ -2,6 +2,14 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-11
+
+@jhchabran
+
+[No healthy agents running](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1649658351891759). Agents are failing to start because of missing volume: `buildkite-git...`. It seems it cannot find the disk attached to the volume. I cannot launch again the pipepline to start fresh because no agents are available. I ended up creating an incident, because of the total disruption of the CI, see: [INC-94](https://sourcegraph.slack.com/archives/C03AHJL049M), which mentions with more details how I fixed it. $DURATION=60m
+
+[Blocked main builds because of mismatch in generated files](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1649669568010659). Joe thought it was a flake due to the log uploading failures and missed that there was an error in the generated files. He's opening a PR. $DURATION=5m
+
 ## 2022-04-06
 
 @bobheadxi
