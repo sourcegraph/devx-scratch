@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-13
+
+@davejrt
+
+`Sourcegraph Cluster (deploy-sourcegraph) QA` tests failing on main with [this build](https://buildkite.com/sourcegraph/sourcegraph/builds/142212#4f3be801-87b7-4f74-baae-e68b54d3fc14/366-368). Some investigation showed [this commit](https://k8s.sgdev.org/github.com/sourcegraph/deploy-sourcegraph/-/commit/f0d13887f6a3f98bb4f518c29ce1d9afc37fc093?visible=3) broke the `low-resource` overlay. I fixed the the `low-resource` overlay with [this commit](https://k8s.sgdev.org/github.com/sourcegraph/deploy-sourcegraph/-/commit/0a8d240f889a8b0b2b0f4ee84fb63e7f21eced82?visible=3) and a [follow up commit](https://k8s.sgdev.org/github.com/sourcegraph/deploy-sourcegraph/-/commit/0a8d240f889a8b0b2b0f4ee84fb63e7f21eced82?visible=3) that adds a test to ensure that all overlays can be generated without error. 
+
 ## 2022-04-12 
 
 @jhchabran
