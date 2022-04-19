@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-19 
+
+@jhchabran
+
+Got asked to [help with a CD issue](https://sourcegraph.slack.com/archives/CMBA8F926/p1650372090576579), Renovate had not picked a new PR in 8h. We uncovered weird behaviour where Renovate was updating the same PR over and over, but had a failed check dating from when we removed `fd` from being installed in every agent. This had been fixed, but the PR having been opened for a month, it was still there. Closing it apparently got Renovate to open a new PR. Coincidentally, Cloudflare had issues in Germany has well, and Renovate seems to be hosted in Germany too. We have no clue on what the exact problem. $DURATION=45m 
+
 ## 2022-04-13
 
 @davejrt
