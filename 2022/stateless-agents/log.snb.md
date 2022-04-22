@@ -199,3 +199,18 @@ Upon rollout, ran into a variety of issues:
   - Fix: [list pods with dispatch label](https://github.com/sourcegraph/infrastructure/commit/4d7ce3cecd962d962cc274d9d079e12d097c6b8e)
 - Deleting PVCs while agents are still rolling out leads to unschedulable nodes, since nodes can't bind to PVCs that are marked for deletion.
   - Fix: [expire PVCs with label, delete only when unused](https://github.com/sourcegraph/infrastructure/commit/48fefd121a43b44658671f24ac0d09c01db482ce)
+
+## 2022-04-21 thoughts
+
+@bobheadxi
+
+No concrete work, but wanted to capture some recent thoughts and updates:
+
+- The switch to `expectedDispatch` checking seems to have worked well. Based on some feedback, I bumped some knobs on the dispatcher ([#3248](https://github.com/sourcegraph/infrastructure/pull/3248)) that primarily increased `ROLLOUT_CONSEQUENT` and it doesn't seem to have caused significant over-provisioning - we should have headroom to increase it more.
+  - However, I'm not sure we can solve for *all* instances of ~45 second wait times - inevitably there will be instances where the agent fleet is at its minimum (currently 25).
+- Potentially remove the somewhat finicky GraphQL API in favour of the `/metrics` API I discovered the other day: [#33991](https://github.com/sourcegraph/sourcegraph/issues/33991), might be a good starter task for a new hire in the future
+- Migrate to `lib/log` ([#33241](https://github.com/sourcegraph/sourcegraph/issues/33241)): [#3255](https://github.com/sourcegraph/infrastructure/pull/3255), will circle back to this next week  since it changes our log format.
+- Not every step needs every `asdf` tool: [#33854](https://github.com/sourcegraph/sourcegraph/issues/33854)
+- Our CI spend for April seems projected to go down by ~37% compared to March's spend
+- I wrote a personal blog post about the dispatcher: [link](https://bobheadxi.dev/stateless-ci/)
+  - Would be cool to see us open-source this, but it's pretty tightly coupled to our own infra at the moment
