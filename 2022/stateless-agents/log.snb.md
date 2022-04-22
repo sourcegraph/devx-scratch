@@ -209,7 +209,7 @@ No concrete work, but wanted to capture some recent thoughts and updates:
 - The switch to `expectedDispatch` checking seems to have worked well. Based on some feedback, I bumped some knobs on the dispatcher ([#3248](https://github.com/sourcegraph/infrastructure/pull/3248)) that primarily increased `ROLLOUT_CONSEQUENT` and it doesn't seem to have caused significant over-provisioning - we should have headroom to increase it more.
   - However, I'm not sure we can solve for *all* instances of ~45 second wait times - inevitably there will be instances where the agent fleet is at its minimum (currently 25).
 - Potentially remove the somewhat finicky GraphQL API in favour of the `/metrics` API I discovered the other day: [#33991](https://github.com/sourcegraph/sourcegraph/issues/33991), might be a good starter task for a new hire in the future
-- Migrate to `lib/log` ([#33241](https://github.com/sourcegraph/sourcegraph/issues/33241)): [#3255](https://github.com/sourcegraph/infrastructure/pull/3255), will circle back to this next week  since it changes our log format.
+- Migrate to `lib/log` ([#33241](https://github.com/sourcegraph/sourcegraph/issues/33241)): [#3255](https://github.com/sourcegraph/infrastructure/pull/3255), will circle back to this next week since it changes our log format and will need an update to our logs-based metrics
 - Not every step needs every `asdf` tool: [#33854](https://github.com/sourcegraph/sourcegraph/issues/33854)
 - Our CI spend for April seems projected to go down by ~37% compared to March's spend
 - I wrote a personal blog post about the dispatcher: [link](https://bobheadxi.dev/stateless-ci/)
