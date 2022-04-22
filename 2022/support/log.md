@@ -4,6 +4,31 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 ## 2022-04-22
 
+@jhchabran Observed two builds (here and here) failing due jobs losing their agents: 
+
+```
+Node condition FrequentContainerdRestart is now: False, reason: NoFrequentContainerdRestart 	NoFrequentContainerdRestart 	Apr 22, 2022, 5:50:28 PM 	Apr 22, 2022, 5:50:28 PM 	1 	
+Node condition FrequentDockerRestart is now: False, reason: NoFrequentDockerRestart 	NoFrequentDockerRestart 	Apr 22, 2022, 5:50:27 PM 	Apr 22, 2022, 5:50:27 PM 	1 	
+Node condition FrequentKubeletRestart is now: False, reason: NoFrequentKubeletRestart 	NoFrequentKubeletRestart 	Apr 22, 2022, 5:50:26 PM 	Apr 22, 2022, 5:50:26 PM 	1 	
+Node condition FrequentUnregisterNetDevice is now: False, reason: NoFrequentUnregisterNetDevice 	NoFrequentUnregisterNetDevice 	Apr 22, 2022, 5:50:26 PM 	Apr 22, 2022, 5:50:26 PM 	1 	
+Node gke-default-buildkite-main-ecd9ee7d-s9r6 status is now: NodeHasNoDiskPressure 	NodeHasNoDiskPressure 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:50:19 PM 	7 	
+Node gke-default-buildkite-main-ecd9ee7d-s9r6 status is now: NodeNotReady 	NodeNotReady 	Apr 22, 2022, 5:50:19 PM 	Apr 22, 2022, 5:50:19 PM 	1 	
+Node gke-default-buildkite-main-ecd9ee7d-s9r6 status is now: NodeHasSufficientMemory 	NodeHasSufficientMemory 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:50:19 PM 	7 	
+Node gke-default-buildkite-main-ecd9ee7d-s9r6 status is now: NodeHasSufficientPID 	NodeHasSufficientPID 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:50:19 PM 	7 	
+Started Kubernetes kubelet. 	KubeletStart 	Apr 22, 2022, 4:55:25 PM 	Apr 22, 2022, 5:49:49 PM 	2 	
+invalid capacity 0 on image filesystem 	InvalidDiskCapacity 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:49:49 PM 	1 	
+Updated Node Allocatable limit across pods 	NodeAllocatableEnforced 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:49:49 PM 	1 	
+Starting kubelet. 	Starting 	Apr 22, 2022, 5:49:49 PM 	Apr 22, 2022, 5:49:49 PM 	1 	
+Starting Docker Application Container Engine... 	DockerStart 	Apr 22, 2022, 4:55:25 PM 	Apr 22, 2022, 5:49:39 PM 	4 	
+Node condition FrequentContainerdRestart is now: Unknown, reason: NoFrequentContainerdRestart 	NoFrequentContainerdRestart 	Apr 22, 2022, 5:48:25 PM 	Apr 22, 2022, 5:48:25 PM 	1 	
+Node condition FrequentDockerRestart is now: Unknown, reason: NoFrequentDockerRestart 	NoFrequentDockerRestart 	Apr 22, 2022, 5:47:25 PM 	Apr 22, 2022, 5:47:25 PM 	1 	
+Node condition FrequentKubeletRestart is now: Unknown, reason: NoFrequentKubeletRestart 	NoFrequentKubeletRestart 	Apr 22, 2022, 5:46:25 PM 	Apr 22, 2022, 5:46:25 PM 	1 	
+Node condition FrequentUnregisterNetDevice is now: Unknown, reason: NoFrequentUnregisterNetDevice 	NoFrequentUnregisterNetDevice 	Apr 22, 2022, 5:46:25 PM 	Apr 22, 2022, 5:46:25 PM 	1 	
+Node gke-default-buildkite-main-ecd9ee7d-s9r6 status is now: NodeNotReady 	NodeNotReady 	Apr 22, 2022, 5:42:59 PM 	Apr 22, 2022, 5:42:59 PM 	1 	
+```
+
+Reading through the Buildkite docs, we can specifically address this case and force a retry: https://buildkite.com/docs/pipelines/command-step#automatic-retry-attributes, by watching for the -1 exit status: https://github.com/sourcegraph/sourcegraph/pull/34370
+
 @jhchabran Depguard has [failed again, off a fresh branch from main](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1650638888337509), so I had to disable it again. 
 
 ## 2022-04-19 
