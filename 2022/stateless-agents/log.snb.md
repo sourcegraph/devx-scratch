@@ -214,3 +214,4 @@ No concrete work, but wanted to capture some recent thoughts and updates:
 - Our CI spend for April seems projected to go down by ~37% compared to March's spend
 - I wrote a personal blog post about the dispatcher: [link](https://bobheadxi.dev/stateless-ci/)
   - Would be cool to see us open-source this, but it's pretty tightly coupled to our own infra at the moment
+- Noticed an issue where an agent has completed a job, but doesn't exit and stays online. Buildkite then repeatedly tries to assign a job to said agent, which refusses to start. Had to manually stop the agent, which got the build going again. [Thread](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1650596858658529?thread_ts=1650592129.394729&cid=C02FLQDD3TQ)
