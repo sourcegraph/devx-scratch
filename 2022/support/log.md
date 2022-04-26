@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-04-26
+
+@jhchabran Another round of issues around the firewall, this time after the merge or @bobheadxi's fix. After Zooming with the person that asked for help, it became apparent that some services weren't caught by the code, which I patched here https://github.com/sourcegraph/sourcegraph/pull/34501.  $DURATION=45m
+
 ## 2022-04-22
 
 @jhchabran Observed two builds (here and here) failing due jobs losing their agents: 
