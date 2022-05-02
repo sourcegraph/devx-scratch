@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-02
+
+@jhchabran Noticed that the builds were stuck this morning, because a new version of rust protobuf-codegen has been released and the dev/generate.sh script wasn't setting any expectation about which version to get. As the new release was publish, all our builds started to fail. I have put up a PR https://github.com/sourcegraph/sourcegraph/pull/34756 with the fix. $DURATION=20m
+
 ## 2022-04-26
 
 @jhchabran Another round of issues around the firewall, this time after the merge or @bobheadxi's fix. After Zooming with the person that asked for help, it became apparent that some services weren't caught by the code, which I patched here https://github.com/sourcegraph/sourcegraph/pull/34501.  $DURATION=45m
