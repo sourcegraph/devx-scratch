@@ -3,6 +3,19 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-05-04
+
+@bobheadxi
+
+I have been experimenting with [`github.com/bitfield/script`](https://github.com/bitfield/script). To date, the only usage that has stuck is [#34926](https://github.com/sourcegraph/sourcegraph/pull/34926), and even that is debatable. Thoughts on why:
+
+1. `run.InRoot`, `run.GitCmd`, etc. are already pretty good 75% of the time.
+2. `scipt.Pipe()` semantics are really weird sometimes, especially with `Filter` etc, and you end up really question whether or not it's better to simply run commands one by one. Example: https://github.com/sourcegraph/sourcegraph/pull/34680/files
+3. Some things that are kind of important are missing, such as setting the execution context's directory, using `context.Context`, using `Exec` with `[]string`, and so on.
+4. Most of the helpers don't really seem that useful when it comes down to it
+
+I think for our use cases it might be simpler to build our own script pipeline thingo.
+
 ## 2022-03-30
 
 @jhchabran
