@@ -2,9 +2,27 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-04
+
+@bobheadxi
+
+Made `pr-auditor` required in `sourcegraph/sourcegraph` on [request](https://sourcegraph.slack.com/archives/C01G34KFYE4/p1651677045477279?thread_ts=1651665256.667259&cid=C01G34KFYE4). Noticed issue where `pr-auditor` checks do not persist, and PRs get stuck on "waiting for status" - we [can't set status by branch](https://github.com/sourcegraph/sourcegraph/pull/34913#issuecomment-1117563565), so we need to register the action to run on the `synchronize` event ([#34914](https://github.com/sourcegraph/sourcegraph/pull/34914)) i.e. when a push happens as well. We'll need to propagate this fix to all repos with a batch change if more repos make this a required check. $DURATION=15m
+
+Hadolint script broke. The shell script was a bit cryptic so I just moved the whole thing into `sg`: [#34926](https://github.com/sourcegraph/sourcegraph/pull/34926) $DURATION=30m
+
+A few teammates reported occasionally running into *kernel* panics with `sg start`. Consensus seems to be that it's probably not directly related to `sg`, but might be worth looking into - for now it appears infrequent and I can't make much sense of it. [Thread](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1651696165060899), [core dump](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1651699647925089?thread_ts=1651696165.060899&cid=C01N83PS4TU) $DURATION=15m
+
+Worked on a dependency version guard for an incident a few weeks ago: [#34929](https://github.com/sourcegraph/sourcegraph/pull/34929) $DURATION=30m
+
 ## 2022-05-02
 
 @jhchabran Noticed that the builds were stuck this morning, because a new version of rust protobuf-codegen has been released and the dev/generate.sh script wasn't setting any expectation about which version to get. As the new release was publish, all our builds started to fail. I have put up a PR https://github.com/sourcegraph/sourcegraph/pull/34756 with the fix. $DURATION=20m
+
+## 2022-04-28
+
+@bobheadxi
+
+Spent a lot of time trying to make firewall popups go away. Pursued the firewall command approach for a long time (https://github.com/sourcegraph/sourcegraph/pull/34680), before giving up and finding an infinitely easier solution: https://github.com/sourcegraph/sourcegraph/pull/34714 $DURATION=240m
 
 ## 2022-04-26
 
