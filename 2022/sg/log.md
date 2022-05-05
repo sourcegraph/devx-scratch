@@ -14,6 +14,8 @@ I have been experimenting with [`github.com/bitfield/script`](https://github.com
 3. Some things that are kind of important are missing, such as setting the execution context's directory, using `context.Context`, using `Exec` with `[]string`, and so on.
 4. Most of the helpers don't really seem that useful when it comes down to it
 
+@jhchabran had some thoughts here as well: https://github.com/sourcegraph/sourcegraph/discussions/33903#discussioncomment-2639015
+
 I think for our use cases it might be simpler to build our own script pipeline thingo.
 
 ## 2022-03-30
