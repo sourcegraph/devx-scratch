@@ -3,6 +3,38 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-05-09
+
+@bobheadxi @jhchabran @danieldides
+
+Last week we had a discussion around scripting in Go. We're opting to introduce a new library, [`github.com/sourcegraph/run`](https://github.com/sourcegraph/run), that provides a builder pattern for executing commands and operating on their output in a programmatic manner - WIP example:
+
+```go
+// Export lines
+lines, _ := run.Cmd(ctx, "ls").Run().Lines()
+for i, l := range lines {
+    fmt.Printf("line %d: %q\n", i, l)
+}
+
+// Render new README file
+var readmeData bytes.Buffer
+_ = run.Cmd(ctx, "cat", "README.md").Run().Stream(&readmeData)
+replaced := exampleBlockRegexp.ReplaceAll(readmeData.Bytes(), exampleData.Bytes())
+
+// Pipe modified data to command
+_ = run.Cmd(ctx, "cp /dev/stdin README.md").Input(bytes.NewReader(replaced)).Run().Wait()
+
+// Or, just pipe Output directly  to another command!
+lsOut := run.Cmd(ctx, "ls cmd").Run().
+    Filter(func(line []byte) ([]byte, bool) {
+        return append([]byte("./cmd/"), line...), false
+    })
+_ = run.Cmd(ctx, "cat").Input(lsOut).Run().
+    Stream(os.Stdout)
+```
+
+Also, related to the previous `sg analytics` discussion, just landed [dev/sg: track local sg analytics that can be submitted manually](https://github.com/sourcegraph/sourcegraph/pull/35033) today - next steps TBD.
+
 ## 2022-05-04
 
 @bobheadxi
