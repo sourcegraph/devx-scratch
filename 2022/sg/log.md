@@ -33,7 +33,7 @@ _ = run.Cmd(ctx, "cat").Input(lsOut).Run().
     Stream(os.Stdout)
 ```
 
-Also, related to the previous `sg analytics` discussion, just landed [dev/sg: track local sg analytics that can be submitted manually](https://github.com/sourcegraph/sourcegraph/pull/35033) today - next steps TBD.
+Also, related to the previous `sg analytics` discussion, just landed [dev/sg: track local sg analytics that can be submitted manually](https://github.com/sourcegraph/sourcegraph/pull/35033) toda. Spoke with OkayHQ, was told these events will show up in UI after a feature update next week. Also confirmed we can allow users to not submit an identity. Maybe we can generate randomized identifiers.
 
 ## 2022-05-04
 
