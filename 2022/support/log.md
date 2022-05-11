@@ -10,6 +10,10 @@ A [PR broke the main branch](https://sourcegraph.slack.com/archives/C07KZF47K/p1
 
 I submitted a quick PR along the way for the wording in Buildchecker, trying to foster more autonomy from our users: https://github.com/sourcegraph/sourcegraph/pull/35291
 
+@bobheadxi @davejrt
+
+Major outage with asdf caching `tar` failures. Even with that [fixed](https://github.com/sourcegraph/sourcegraph/pull/35334/commits/232fd75c46a32f3a0e0d12633266190de9b7ee02), [back-compat tests continued to fail](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1652308349109149?thread_ts=1652294119.054949&cid=C01N83PS4TU). Eventually [disabled back-compat tests](https://github.com/sourcegraph/sourcegraph/pull/35334#issuecomment-1124362668). $DURATION=90m
+
 ## 2022-05-04
 
 @bobheadxi
