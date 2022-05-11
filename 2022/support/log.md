@@ -2,6 +2,14 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-11
+
+@jhchabran
+
+A [PR broke the main branch](https://sourcegraph.slack.com/archives/C07KZF47K/p1652270071646589?thread_ts=1652268753.495069&cid=C07KZF47K) and I had to revert it. I asked the author if he knew what to do in case of being mentioned by Buildchecker, just out of curiosity and he did. That person did not know about the other run types btw (and he's been with us since Nov '21).
+
+I submitted a quick PR along the way for the wording in Buildchecker, trying to foster more autonomy from our users: https://github.com/sourcegraph/sourcegraph/pull/35291
+
 ## 2022-05-04
 
 @bobheadxi
