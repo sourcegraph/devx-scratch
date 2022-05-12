@@ -2,6 +2,36 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-12
+
+@jhchabran
+
+Investigated [the issue the failing back compat tests](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1652311475381819?thread_ts=1652294119.054949&cid=C01N83PS4TU) and found out that there is an [where the go asdf plugin](https://github.com/kennyp/asdf-golang) reverts to Go 1.18.1 for some obscure reason. 
+
+I first reproduced the error on Buildkite to establish that it's not transient somehow and managed to reproduce it locally by running the back-compat/test.sh script manually with the same arguments that are present in the failing step. I had to tweak things a bit to make it work locally, notably adjusting the `find` command, disabling asdf installation part entirely to circumvent issues with some tools not being available for `arm64`. From there, after triple checking that the issue was indeed coming from the `go test` command, I started to bisect the package list to understand which one was causing the error. After a few tries, I managed to get a zero exit code by excluding the `lib/codeintel/tools` folder and finally isolated `lib/codeintel/tools/lsif-repl` to be the culprit. 
+
+```
+# This will show exit code 2
+./dev/ci/go-backcompat/test.sh exclude github.com/sourcegraph/sourcegraph/enterprise/internal/codeintel/stores/dbstore github.com/sourcegraph/sourcegraph/enterprise/internal/codeintel/stores/lsifstore github.com/sourcegraph/sourcegraph/enterprise/internal/insights github.com/sourcegraph/sourcegraph/internal/database github.com/sourcegraph/sourcegraph/internal/repos github.com/sourcegraph/sourcegraph/enterprise/internal/batches github.com/sourcegraph/sourcegraph/cmd/frontend github.com/sourcegraph/sourcegraph/enterprise/internal/database github.com/sourcegraph/sourcegraph/enterprise/cmd/frontend/internal/batches/resolvers 
+
+
+# This will show exit code 0 (noted the final excluded package)
+./dev/ci/go-backcompat/test.sh exclude github.com/sourcegraph/sourcegraph/enterprise/internal/codeintel/stores/dbstore github.com/sourcegraph/sourcegraph/enterprise/internal/codeintel/stores/lsifstore github.com/sourcegraph/sourcegraph/enterprise/internal/insights github.com/sourcegraph/sourcegraph/internal/database github.com/sourcegraph/sourcegraph/internal/repos github.com/sourcegraph/sourcegraph/enterprise/internal/batches github.com/sourcegraph/sourcegraph/cmd/frontend github.com/sourcegraph/sourcegraph/enterprise/internal/database github.com/sourcegraph/sourcegraph/enterprise/cmd/frontend/internal/batches/resolvers github.com/sourcegraph/sourcegraph/lib/codeintel/tools/lsif-repl
+
+# Go back to the branch, resetting the local mess
+git reset --hard HEAD && rm -Rf migrations && git co . && git co main-dry-run/debug-back-compat
+```
+
+Surprisingly, this package has no test and is just a `main.go`. Running a `git blame` on the file showed that the last change there was a fix from Keegan to make it work with Go `1.18.1`. But the back compat tests are supposed to be running Go `1.17.5`. Running `go version` within the `lsif-repl` folder showed for some reason, even if the `/.tool-versions` specifies Go `1.17.5`, it's actually Go `1.18.1` that is currently running. 
+
+This put me on track toward an `asdf` related issue, a few prints in `asdf` code confirmed it. There is an [issue](https://github.com/kennyp/asdf-golang/issues/79) about someone reporting a similar issue. Reading the doc showed that there is some questionable behaviour if the `legacy_version` setting is enable. Disabling it in my `~/.asdfrc` solved the issue and now Go `1.17.1` is the current version, as expected, within the `lsif-repl` folder. 
+
+Ran a quickbuild over https://buildkite.com/sourcegraph/sourcegraph/builds/147181 to confirm that we can just drop the `.nvmrc` file and opened a PR with a new agent image that has that setting disabled.
+
+---
+
+Failures were reported on the deploy-sourcegraph-cloud pipeline, due to `asdf` installation of `helm` failing. It was caused by an HTTP timeout. I submitted two PRs to fix these on the plugin themselves over https://github.com/Antiarchitect/asdf-helm/pull/12 and https://github.com/luizm/asdf-shfmt/pull/7.
+
 ## 2022-05-11
 
 @jhchabran
