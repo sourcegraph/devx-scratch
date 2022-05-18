@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-18 
+
+@jhchabran
+
+[Valery mentioned that GitStart is blocked on their PR](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1652866114007209) with issuse related to node versions. The problem was rather simple, their pipeline was simply not calling `asdf` at all. As we recently rolled out `asdf` installation into a plugin, that was a rather straightforward fix: https://github.com/sourcegraph/eslint-config/pull/249 DURATION=30m
+
 ## 2022-05-12
 
 @jhchabran
