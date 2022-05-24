@@ -12,6 +12,10 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 [Thorsten noticed that the `main` branch is broken due to the 3.40.0 release](https://sourcegraph.slack.com/archives/C032Z79NZQC/p1653399008176829), it went unnoticed because the support handle for the team is set this week on Robert, which at this time is sleeping. After some investigation, we noticed that Alex Ostrikov merged a commit 6 hours ago that introduced a backward incompatible change, albeit a peculiar one: the database change itself is backward compatible, but not the tests, which were accounting for faulty behaviour. The fix was to [port the flake files to the new 3.40.0 version](https://github.com/sourcegraph/sourcegraph/pull/35942) and [we added along the way a word of warning about this edge case](https://github.com/sourcegraph/sourcegraph/pull/35945). DURATION=45m
 
+@jhchabran
+
+[An arm64 image was used as a base for CAdvisor](https://sourcegraph.slack.com/archives/CMBA8F926/p1653411739808069) and broke the main branch. [Reverted the PR](https://github.com/sourcegraph/sourcegraph/pull/35959) and advised the user on how to fix this. Also, the CI pipeline generator isn't detecting changes in the images and their PR did not catch this. DURATTION=20m
+
 ## 2022-05-23
 
 @jhchabran
