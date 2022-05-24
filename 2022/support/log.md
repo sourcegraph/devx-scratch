@@ -2,6 +2,18 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-24
+
+@jhchabran
+
+[The same exact thing happend to Joe Chen](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1653375898615149), but this time we noticed very quickly that a CI ref file has not been updated and committing https://github.com/sourcegraph/sourcegraph/commit/a9b15bdc32409bbec9c5522c55d4b1f8b20c299c fixed the issue. As for why we're seeing this pattern of behaviour where `sg lint go` hangs if the `sg generate` commands results in a dirty repo, we don't know yet. What's for sure though is that the buffering of the ouptut which makes it appear only once the command has exited is really unpractical when it comes to debugging, and we need to fix this asap.  DURATION=30m .
+
+## 2022-05-23
+
+@jhchabran
+
+[Eric Fritz had trouble with a PR which added new go generate statements](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1653322924295219) We paired with William on this and found out that the result are inconsistent in local, `sg generate` completes, but sometimes `sg lint go` hangs. On CI `sg lint go` consistently hangs. As it was pretty late for us, we unblocked Eric by giving him a branch with a patched version that outputted things straight to stdout. Strangely, forcing the `sg generate` code to produce output did work consistently, which hints at some buffering issue. DURATION=60m.  
+
 ## 2022-05-18 
 
 @jhchabran
