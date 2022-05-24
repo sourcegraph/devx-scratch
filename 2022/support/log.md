@@ -8,6 +8,10 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 [The same exact thing happend to Joe Chen](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1653375898615149), but this time we noticed very quickly that a CI ref file has not been updated and committing https://github.com/sourcegraph/sourcegraph/commit/a9b15bdc32409bbec9c5522c55d4b1f8b20c299c fixed the issue. As for why we're seeing this pattern of behaviour where `sg lint go` hangs if the `sg generate` commands results in a dirty repo, we don't know yet. What's for sure though is that the buffering of the ouptut which makes it appear only once the command has exited is really unpractical when it comes to debugging, and we need to fix this asap.  DURATION=30m .
 
+@jhchabran 
+
+[Thorsten noticed that the `main` branch is broken due to the 3.40.0 release](https://sourcegraph.slack.com/archives/C032Z79NZQC/p1653399008176829), it went unnoticed because the support handle for the team is set this week on Robert, which at this time is sleeping. After some investigation, we noticed that Alex Ostrikov merged a commit 6 hours ago that introduced a backward incompatible change, albeit a peculiar one: the database change itself is backward compatible, but not the tests, which were accounting for faulty behaviour. The fix was to [port the flake files to the new 3.40.0 version](https://github.com/sourcegraph/sourcegraph/pull/35942) and [we added along the way a word of warning about this edge case](https://github.com/sourcegraph/sourcegraph/pull/35945). DURATION=45m
+
 ## 2022-05-23
 
 @jhchabran
