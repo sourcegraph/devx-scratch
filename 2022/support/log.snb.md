@@ -2,6 +2,18 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-05-30
+
+@jhchabran
+
+Paired with Oleg and Jason to help them kickstart https://github.com/sourcegraph/sourcegraph/issues/30536#issuecomment-1032641034. We briefly went over how the CI pipeline works, then rapidly iterated through how to upload something in GCP, create a simple script to do so, where to insert their client bundle upload in the pipeline and more importantly how to make the feedback loop as short as possible: 
+
+```sourcegraph
+context:global repo:^github\.com/sourcegraph/sourcegraph$@b530444 file:^enterprise/dev/ci/internal/ci/pipeline\.go if c.Branch == "fpdx/upload-fe-bundle" {...} patternType:structural
+```
+
+They're going to iterate on that and will come back to us for the reviewing the final PR. 
+
 ## 2022-05-24
 
 @jhchabran
