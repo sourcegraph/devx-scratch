@@ -3,6 +3,30 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-05-27
+
+@bobheadxi
+
+Recently an issue was discovered where `sg lint go` would hang on the `go generate` check if a diff was found ([#35918](https://github.com/sourcegraph/sourcegraph/issues/35918)). The issue was identified to be the call to `std.Out.WriteMarkdown`, which seemed to block forever in Buildkite - a fix was made to check for `BUILDKITE=true` and write plain text if so ([#36043](https://github.com/sourcegraph/sourcegraph/pull/36043)).
+
+This was problematic because:
+
+- the whole point of adding `std.Out.WriteMarkdown` was to make output more readable in CI as well, which this fix circumvented
+- I wanted to avoid `BUILDKITE=true` checks wherever possible, since that goes directly against our goals of unifying CI and local dev and rectifying the divergence that has built up over time
+
+I did a dive into the issue to see if I could resolve it - I found it super bizarre that the Markdown write could hang indefinitely! Under the hood [Glamour](https://github.com/charmbracelet/glamour) (our Markdown printer) quickly delegates to [Goldmark](https://github.com/yuin/goldmark) which seemed super unlikely to have this sort of bug. My train of thought:
+
+1. I figured it since it appeared to be platform-dependent, it meant it was likely that some sort of attempted terminal/platform detection was occurring - the write function was never exiting, and we write to string buffers in various locations, so it probably had to happen before the write step (string buffer is platform-agnostic so it seemed unlikely it would be while writing)
+2. I found the call to [`termenv.HasDarkBackground`](https://sourcegraph.com/github.com/sourcegraph/sourcegraph@e62632dc0ca53261d80f62cbd7e270a9733c3a32/-/blob/lib/output/output.go?L235=) and immediately thought this might be a newly introduced bug, and some print statement debugging confirmed that the code stops exactly at this point. Removing that and assuming a dark background, the diff rendered fine in Buildkite!
+3. I looked into reverting to [`WithAutoStyle`](https://github.com/charmbracelet/glamour/blob/d5fb104a74ca0a823562b7d0216f9a5729bede8b/glamour.go#L124) but stepping into that revealed [the same call to `termenv.HasDasrkBackground`](https://github.com/charmbracelet/glamour/blob/d5fb104a74ca0a823562b7d0216f9a5729bede8b/glamour.go#L248), so we needed a workaround
+4. I then looked back at how we can avoid this entire thing, read up on the override pattern in `lib/output`, decided that the cleanest way forward would refactor the whole detection thing.
+
+The result was [#36193 dev/sg: fix diff output in Buildkite without using Buildkite condition](https://github.com/sourcegraph/sourcegraph/pull/36193), which:
+
+- Adds a `ForceDarkBackground` output option, set to true in Buildkite
+- Refactors output capabilities detection to be lazy (if an override is set, do not do any detection at all)
+- Changes usages of `output.NewOutput` to `std.NewOutpu`t for consistency and to avoid the problematic dark background detection
+
 ## 2022-05-09
 
 @bobheadxi @jhchabran @danieldides
