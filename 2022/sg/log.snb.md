@@ -7,11 +7,11 @@ DevX teammates hacking on `sg` log. To add an entry, just add an H2 header start
 
 @bobheadxi
 
-Recently an issue was discovered where `sg lint go` would hang on the `go generate` check if a diff was found ([#35918](https://github.com/sourcegraph/sourcegraph/issues/35918)). The issue was identified to be the call to `std.Out.WriteMarkdown`, which seemed to block forever in Buildkite - a fix was made to check for `BUILDKITE=true` and write plain text if so ([#36043](https://github.com/sourcegraph/sourcegraph/pull/36043)).
+Recently an issue was discovered where `sg lint go` would hang on the `go generate` check if a diff was found ([#35918](https://github.com/sourcegraph/sourcegraph/issues/35918)). The issue was identified to be the call to `std.Out.WriteMarkdown`, which seemed to block forever in Buildkite - a workaround was made to check for `BUILDKITE=true` and write plain text if so, to allow pipelines to pass again ([#36043](https://github.com/sourcegraph/sourcegraph/pull/36043)).
 
-This was problematic because:
+This workaround was not a great long-term solution because:
 
-- the whole point of adding `std.Out.WriteMarkdown` was to make output more readable in CI as well, which this fix circumvented
+- the whole point of adding `std.Out.WriteMarkdown` was to make output more readable in CI as well, which this workaround circumvented
 - I wanted to avoid `BUILDKITE=true` checks wherever possible, since that goes directly against our goals of unifying CI and local dev and rectifying the divergence that has built up over time
 
 I did a dive into the issue to see if I could resolve it - I found it super bizarre that the Markdown write could hang indefinitely! Under the hood [Glamour](https://github.com/charmbracelet/glamour) (our Markdown printer) quickly delegates to [Goldmark](https://github.com/yuin/goldmark) which seemed super unlikely to have this sort of bug. My train of thought:
