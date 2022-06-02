@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-02 
+
+@jhchabran Noah stumbled on an edge case where we're trying to use `os.Rename` across different partitions which always fail. Fix in https://github.com/sourcegraph/sourcegraph/pull/36469 DURATION=10m
+
 ## 2022-06-01
 
 @jhchabran Jean Du Plessis gave me admin privileges, so I was able to fix the pr-auditor-check issue on sg/infra. DURATION=15m Thanks so much to the person that added the env var in 1Password, it enabled to be sure I was targeting the right account.
