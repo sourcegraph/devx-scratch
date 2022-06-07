@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-07
+
+@jhchabran This morning, we started seeing linter errors such as https://buildkite.com/sourcegraph/sourcegraph/builds/152538#01813cb1-4def-4b96-9ad5-f7a2fcc39403. We did not manage to reproduce those errors locally, neither on our laptops or within linux VMs. Heck, even on CI, when running the linter it passed. This was the hint that we're seeing a race in between the Go generators and the docsite checker. After trying a few hacks, I simply disabled the docsite linter until we can fix the whole issue. 
+
 ## 2022-06-02 
 
 @jhchabran Noah stumbled on an edge case where we're trying to use `os.Rename` across different partitions which always fail. Fix in https://github.com/sourcegraph/sourcegraph/pull/36469 DURATION=10m
