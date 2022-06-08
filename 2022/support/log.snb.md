@@ -2,6 +2,14 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-08 
+
+@jhchabran and @william The executors image, was failing consistently with various errors, with no direct changes on its code, and was still working yesterday. Those were caused by an outage on Launchpad which broke adding gitcore ppa. After a while, those errors stopped appearing, but we still saw a very obscure failure. The executor job is building images for both GCP and AWS, but the GCP one was failing while building a Docker image, with no apparent reason. A silent stop when running apt-get update. It took us a while to find out that what were seeing here was a kernel panic, which was [reported earlier this morning](https://bugs.launchpad.net/ubuntu/+source/linux-aws/+bug/1977919) on the ubuntu 20.04 LTS daily build that is being used to run the VM building the GCP image. The solution was to [pin down the image](https://github.com/sourcegraph/sourcegraph/pull/36782) to the previous image, that is known to work.  
+
+It was hard to see, because the [output from the script](https://buildkite.com/sourcegraph/sourcegraph/builds/152871#0181425c-2a81-48bd-b06b-e2b61795a9a6/363-1180) was just `+ apt-get update` then `gcp: build has errors` and goodbye. It took look at the logs on the serial port to finally spot that it was a [kernel panic](https://console.cloud.google.com/compute/instancesDetail/zones/us-central1-c/instances/packer-62a078b1-78e2-2f65-3aae-62c470946e69/console?port=1&authuser=1&project=sourcegraph-ci).
+
+Along the way we found out that the executors job was run on every build where it shouldn't have been. After a bit of digging, it came up that the method used to compute if a new executor build is required or not wasn't stable anymore. William brilliantly rememebered reading about a new flag in Go's changelog recently, which led to [a fix](https://github.com/sourcegraph/sourcegraph/pull/36778). 
+
 ## 2022-06-07
 
 @jhchabran This morning, we started seeing linter errors such as https://buildkite.com/sourcegraph/sourcegraph/builds/152538#01813cb1-4def-4b96-9ad5-f7a2fcc39403. We did not manage to reproduce those errors locally, neither on our laptops or within linux VMs. Heck, even on CI, when running the linter it passed. This was the hint that we're seeing a race in between the Go generators and the docsite checker. After trying a few hacks, I simply disabled the docsite linter until we can fix the whole issue. 
