@@ -15,7 +15,7 @@ I recommended the following patch after confirming the command worked locally ([
 + goGet := exec.Command("go", "get", "github.com/sourcegraph/src-cli/cmd/src@3.39.2")
 ```
 
-I'm very impressed this hasn't caused issues in the past, e.g. by being caught by the `go generate` check during lints, though I suppose the `src-cli` generated docs output might not change that often. This patch currently only exists on `3.39.1-insightsdb-patch` - we might want to include some variation of it in `main`, but I do not think
+I'm very impressed this hasn't caused issues in the past, e.g. by being caught by the `go generate` check during lints, though I suppose the `src-cli` generated docs output might not change that often. This patch currently only exists on `3.39.1-insightsdb-patch` - we might want to include some variation of it in `main`, but I do not think it'll be very ergonomic to update (i.e. it'll require some automated PR to `sourcegraph` whenever `src-cli` is updated).
 
 ## 2022-06-08
 
