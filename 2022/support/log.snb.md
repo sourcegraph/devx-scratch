@@ -2,7 +2,22 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
-## 2022-06-08 
+## 2022-06-09
+
+@bobheadxi After repeated attempts to cut a patch release for 3.39, there were still build issues where compilation errors were appearing on Go 1.17-incompatible code (the `any` type alias) despite no such code being present in Coury's 3.39 branch (`3.39.1-insightsdb-patch`). Eventually pinned this down to the `src-cli` docs generation code pulling down the *latest* version of `src-cli` to generate docs, regardless of what version of the branch we are on:
+
+https://sourcegraph.com/github.com/sourcegraph/sourcegraph@3.39.1-insightsdb-patch/-/blob/doc/cli/references/doc.go?L101
+
+I recommended the following patch after confirming the command worked locally ([08090219ed7](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/commit/08090219ed7f09892ff63033c0f80899ea95e17b)):
+
+```diff
+- goGet := exec.Command("go", "get", "github.com/sourcegraph/src-cli/cmd/src")
++ goGet := exec.Command("go", "get", "github.com/sourcegraph/src-cli/cmd/src@3.39.2")
+```
+
+I'm very impressed this hasn't caused issues in the past, e.g. by being caught by the `go generate` check during lints, though I suppose the `src-cli` generated docs output might not change that often. This patch currently only exists on `3.39.1-insightsdb-patch` - we might want to include some variation of it in `main`, but I do not think
+
+## 2022-06-08
 
 @jhchabran and @william The executors image, was failing consistently with various errors, with no direct changes on its code, and was still working yesterday. Those were caused by an outage on Launchpad which broke adding gitcore ppa. After a while, those errors stopped appearing, but we still saw a very obscure failure. The executor job is building images for both GCP and AWS, but the GCP one was failing while building a Docker image, with no apparent reason. A silent stop when running apt-get update. It took us a while to find out that what were seeing here was a kernel panic, which was [reported earlier this morning](https://bugs.launchpad.net/ubuntu/+source/linux-aws/+bug/1977919) on the ubuntu 20.04 LTS daily build that is being used to run the VM building the GCP image. The solution was to [pin down the image](https://github.com/sourcegraph/sourcegraph/pull/36782) to the previous image, that is known to work.  
 
