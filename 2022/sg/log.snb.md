@@ -3,6 +3,23 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-06-09
+
+@bobheadxi Following last Friday's `sg` hack hour, I've been working on a shared `check.Runner` construct that can be applied to both `sg lint` and `sg setup`: https://github.com/sourcegraph/sourcegraph/pull/36556
+
+Most details and goals are in the above PR, but some other thoughts I've run into while working on this:
+
+- The way `output.Output` and `std.Output` are structured makes it very hard to use anything other than just raw output - for example, you can't choose to have them backed by an alternative `output.Writer` implementation like `Pending`. You either get to have nice things like `WriteMarkdown`, or you have the very bare-bones `output.Writer`. I spiked moving things around and it was very complicated, and likely not possible.
+- `output.Pending`, `output.Progress`, etc are super nice when they work, but can be quite hard to use correctly. You also can't have multiple of them, which makes sense from a terminal perspective, but I approached it with too much of a frontend perspective and confused myself quite a bit thinking I might be able to nest output and stuff. [`charmbracelet/bubbletea`](https://github.com/charmbracelet/bubbletea) has some nice paradigms for that, but probably way overkill unless "stunning terminal visuals" becomes an Enablement goal (...unless...?????).
+- Dealing with requests for input when streaming command output to `std.Output` causes commands to stall, so we must ask for input separately. This happens because we can't stream a line that hasn't ended - most input prompts to not end with a new line.
+  - In the `gcloud` install, we helpfully get a flag that disables prompts. In the 1Password CLI `op`, we do not, which was a bit disappointing.
+- It was very hard to understand the `sg setup` code, and as I refactored it to use as internals for `check.Runner` I broke things many times. Going auto-fix as a first-class citizen and putting manual fixing on the backburner made things a lot simpler (...hopefully).
+  - Related to this, I got some interesting feedback from Michael today, who said that he never used `sg setup`, and set things up manually himself. I wonder if the audience for manual fixing might be mutually exclusive from those that want to use `sg setup`.
+  - Metrics would be good to get concrete data about the above.
+- Seeing the new unit tests for `check.Runner` work is very satisfying, and the integration tests for `sg setupv2` went pretty smoothly except for Docker and `caddy-trust` and auth-related setup.
+
+It's been a sizeable effort, but I'm relatively optimistic this is a worthwhile investment - `sg setup` can be re-oriented as the mechanism for keeping your environment up to date (away from the deprecated onboarding goal), and unifying the internals of `sg setup` and `sg lint` will helps us maintain both in a more nimble manner (hopefully).
+
 ## 2022-05-27
 
 @bobheadxi
