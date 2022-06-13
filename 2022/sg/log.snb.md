@@ -7,7 +7,7 @@ DevX teammates hacking on `sg` log. To add an entry, just add an H2 header start
 
 @burmudar I've been implementing a feedback command on sg and I've encountered some  unexpected weirdness/complexity
 
-@bobheadxi and I discussed that it would be cool if feedback could open a discussion on HERE. So I've been looking into how to create a discussion. Surely Github has an API for that ?
+@bobheadxi and I discussed that it would be cool if feedback could open a discussion on [the repository discussions page](https://github.com/orgs/sourcegraph/teams/dev-experience/discussions/). So I've been looking into how to create a discussion. Surely Github has an API for that ?
 They do, and there are actually three ways to create a discussion on Github...
 
 1. Open up the url `https://github.com/sourcegraph/sourcegraph/discussions/new`. That is it. You can't specify the title, category or content in the url. I even thought of doing some bookmarklet/javascript in the url bar magic to get it to work, but Firefox has executing Javascript in the url off by default (probably a good thing too). Finally, you also can't just send a Form POST since you have to have a session token, which is a option but very hacky.
