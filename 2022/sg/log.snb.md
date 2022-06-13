@@ -3,6 +3,28 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+- ## 2022-06-13
+
+@burmudar I've been implementing a feedback command on sg and I've encountered some  unexpected weirdness/complexity
+
+@bobheadxi and I discussed that it would be cool if feedback could open a discussion on HERE. So I've been looking into how to create a discussion. Surely Github has an API for that ?
+They do, and there are actually three ways to create a discussion on Github...
+
+1. Open up the url `https://github.com/sourcegraph/sourcegraph/discussions/new`. That is it. You can't specify the title, category or content in the url. I even thought of doing some bookmarklet/javascript in the url bar magic to get it to work, but Firefox has executing Javascript in the url off by default (probably a good thing too). Finally, you also can't just send a Form POST since you have to have a session token, which is a option but very hacky.
+2. Use the GraphQL API. A bit hesitant to use to use it, as a quick scan didn't show that it was being in SG _yet_. Wanted to check with the team first.
+3. Use the REST API and enter a dark forgotten corner of Github. It confusingly (not so confusing in hindsight) creates a discussion under your teams page in your organisation. Where as our actual intention is the create a discussion on the repository. This is apparently not a thing. You have to use the GraphQL API. I which I knew that earlier but I guess that is what a rabbit hole is!
+
+I've opted to use option 1 as a general fallback with the feedback command. If the user doesn't provide arguments, open the url. If we don't have a GitHub token, open the url. We've also discussed having `sg feedback` open up your editor so that you can type out our feedback in your fav editor. This turned out to have some small issues:
+
+* `vim` _just works_
+* `vscode` you have to invoke with `-w` so that it waits till the file is closed
+* `emacs` ... I mean it launched but I don't know if it is the version I installed but it just did nothing
+* `open -t -W` opens up using your configured text editor for the filetype and waits for it. TextEditor just hanged on my mac
+
+The above was just of the few editors I tested. We could probably handle each editor purculiarities but I don't think it is sustainable. For now the editor command defaults to $EDITOR and the user can override it with `--editor` command but I'm think it needs some more thinking.
+
+Thus I think for a low entry bar after this rabbit hole, I'm going to for now first just open the url, while I do the implementation of the GraphQL part.
+
 ## 2022-06-09
 
 @bobheadxi Following last Friday's `sg` hack hour, I've been working on a shared `check.Runner` construct that can be applied to both `sg lint` and `sg setup`: https://github.com/sourcegraph/sourcegraph/pull/36556
@@ -127,3 +149,4 @@ Idea brought up [Scratchpad - Improving engineering onboarding: tooling](https:/
 - added one for `sg ci` (https://github.com/sourcegraph/sourcegraph/pull/32857)
 - we don’t have `sg monitoring` yet, and we don’t even know if we will continue using Grafana going forward
 - not much else to add?
+
