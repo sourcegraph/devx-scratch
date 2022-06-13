@@ -2,6 +2,16 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-13
+
+@jhchabran We saw a [strange failure](https://buildkite.com/sourcegraph/sourcegraph/builds/154191#01815d66-41f0-46a8-9ebf-10e4806cba3a/114-142}) while building Docker images: 
+
+```
+failed to solve with frontend dockerfile.v0: failed to create LLB definition: failed to do request: Head https://private-docker-registry:5000/v2/library/postgres/manifests/sha256:b815f145ef6311e24e4bc4d165dad61b2d8e4587c96cea2944297419c5c93054?ns=docker.io: http: server gave HTTP response to HTTPS client
+```
+
+It caused buildchecker to kick in and lock the `main` branch. Restarting the `private-docker-registry` fixed the problem. 
+
 ## 2022-06-09
 
 @bobheadxi After repeated attempts to cut a patch release for 3.39, there were still build issues where compilation errors were appearing on Go 1.17-incompatible code (the `any` type alias) despite no such code being present in Coury's 3.39 branch (`3.39.1-insightsdb-patch`). Eventually pinned this down to the `src-cli` docs generation code pulling down the *latest* version of `src-cli` to generate docs, regardless of what version of the branch we are on:
