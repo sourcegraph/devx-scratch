@@ -3,14 +3,14 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
-- ## 2022-06-13
+## 2022-06-13
 
 @burmudar I've been implementing a feedback command on sg and I've encountered some  unexpected weirdness/complexity
 
 @bobheadxi and I discussed that it would be cool if feedback could open a discussion on [the repository discussions page](https://github.com/orgs/sourcegraph/teams/dev-experience/discussions/). So I've been looking into how to create a discussion. Surely Github has an API for that ?
 They do, and there are actually three ways to create a discussion on Github...
 
-1. Open up the url `https://github.com/sourcegraph/sourcegraph/discussions/new`. That is it. You can't specify the title, category or content in the url. I even thought of doing some bookmarklet/javascript in the url bar magic to get it to work, but Firefox has executing Javascript in the url off by default (probably a good thing too). Finally, you also can't just send a Form POST since you have to have a session token, which is a option but very hacky.
+1. Open up the url `https://github.com/sourcegraph/sourcegraph/discussions/new`. That is it. You can't specify the title, category or content in the url. I even thought of doing some bookmarklet/javascript in the url bar magic to get it to work, but Firefox has executing Javascript in the url off by default (probably a good thing too). Finally, you also can't just send a Form POST since you have to have a session token, which is a option but very hacky. (*update* @bobheadxi later pointed out you can specify the title, category, etc with something like https://github.com/sourcegraph/sourcegraph/discussions/new?title=foobar&body=hi%20william)
 2. Use the GraphQL API. A bit hesitant to use to use it, as a quick scan didn't show that it was being in SG _yet_. Wanted to check with the team first.
 3. Use the REST API and enter a dark forgotten corner of Github. It confusingly (not so confusing in hindsight) creates a discussion under your teams page in your organisation. Where as our actual intention is the create a discussion on the repository. This is apparently not a thing. You have to use the GraphQL API. I which I knew that earlier but I guess that is what a rabbit hole is!
 
