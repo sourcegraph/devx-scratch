@@ -9,7 +9,7 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 Security is looking for help to upgrade to Postgres 12.11 in the single-container image: https://github.com/sourcegraph/sourcegraph/pull/37227
 However, 3.12 is the only branch with postgres 12, and it stops at 12.10: https://pkgs.alpinelinux.org/packages?name=postgresql&branch=v3.12, while 3.13 jumps to postgres 13.7: https://pkgs.alpinelinux.org/packages?name=postgresql&branch=v3.13
 
-In `v3.15/community`, there is https://pkgs.alpinelinux.org/packages?name=postgresql*&branch=v3.15&repo=community, so I try to use it:
+In `v3.15/community`, there is https://pkgs.alpinelinux.org/package/v3.15/community/aarch64/postgresql12 which seems to be the only package that satisfies the requirements, so I try to use it:
 
 ```dockerfile
 RUN apk add --no-cache --upgrade --verbose \
