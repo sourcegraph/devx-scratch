@@ -2,6 +2,38 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-16
+
+@jhchabran Following up on the request from Security that @bobheadxi mentioned in yesterday's entry, I gave a spin out of curiosity to simply patching the package itself in the Alpine repository. I was pleased to see that it was really straightforward. 
+
+```
+docker run -it --name alpine-sdk alpine:3.12.12
+apk add alpine-sdk 
+adduser tech 
+addgroup tech wheel
+addgroup tech abuild
+su tech 
+git clone https://gitlab.alpinelinux.org/alpine/aports
+abuild-keygen -a -i
+cd aports/main/postgresql
+# edited the APKBUILD and bumped the version
+abuild checksum
+make
+abuild -r
+# tarballed ~/packages 
+```
+
+```
+docker run -it --name alpine-test-the-build alpine:3.12.12
+# get the tarball under ~ 
+apk add --allow-untrusted --repository ~/packages/main/ postgresql=12.11-r0
+# ... started the pg server and made sure it's running the right version
+```
+
+I gave security the build, asked them what's the priority on this, I'll probably have to dig in further to understand what's the process of updating a package in the main repo in an old branch such as `v3.12.12` in Alpine.
+
+@DURATION=45m
+
 ## 2022-06-15
 
 @bobheadxi
