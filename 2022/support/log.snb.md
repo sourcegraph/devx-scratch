@@ -2,6 +2,77 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-15
+
+@bobheadxi
+
+Security is looking for help to upgrade to Postgres 12.11 in the single-container image: https://github.com/sourcegraph/sourcegraph/pull/37227
+However, 3.12 is the only branch with postgres 12, and it stops at 12.10: https://pkgs.alpinelinux.org/packages?name=postgresql&branch=v3.12, while 3.13 jumps to postgres 13.7: https://pkgs.alpinelinux.org/packages?name=postgresql&branch=v3.13
+
+In `v3.15/community`, there is https://pkgs.alpinelinux.org/packages?name=postgresql*&branch=v3.15&repo=community, so I try to use it:
+
+```dockerfile
+RUN apk add --no-cache --upgrade --verbose \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community \
+    'postgresql12>=12.11' \
+    'postgresql12-contrib>=12.11'
+```
+
+We get this error:
+
+```none
+#6 2.325   postgresql-common (no such package):
+#6 2.325     required by: postgresql12-12.11-r0[postgresql-common]
+#6 2.325                  postgresql12-client-12.11-r0[postgresql-common]
+#6 2.325   so:libicui18n.so.69 (no such package):
+#6 2.325     required by: postgresql12-12.11-r0[so:libicui18n.so.69]
+#6 2.325   so:libicuuc.so.69 (no such package):
+#6 2.325     required by: postgresql12-12.11-r0[so:libicuuc.so.69]
+#6 2.325   so:libldap.so.2 (no such package):
+#6 2.325     required by: postgresql12-12.11-r0[so:libldap.so.2]
+```
+
+Using [this reference](https://alpine.pkgs.org/3.15/alpine-community-x86_64/postgresql12-12.11-r0.apk.html) to try and piece together what's missing, I ended up with something like this:
+
+```dockerfile
+FROM sourcegraph/alpine-3.14:154143_2022-06-13_1eababf8817e@sha256:f1c4ac9ca1a36257c1eb699d0acf489d83dd86e067b1fc3ea4a563231a047e05
+USER root
+
+# postgres12 requires these things that aren't in /community
+RUN apk add --no-cache --verbose \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main \
+    'icu-libs' \
+    'postgresql-common'
+# 3.15 has libldap 2.6 which cannot be used by postgres12, so we try to get it from 3.14
+RUN apk add --no-cache --verbose \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/v3.14/main \
+    'libldap'
+
+RUN apk add --no-cache --upgrade --verbose \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community \
+    'postgresql12>=12.11' \
+    'postgresql12-contrib>=12.11'
+```
+
+Sadly, even this results in unsatisfiable dependencies:
+
+```none
+#7 2.866 ERROR: unable to select packages:
+#7 2.925   so:libldap.so.2 (no such package):
+#7 2.925     required by: postgresql12-12.11-r0[so:libldap.so.2]
+```
+
+No cigar. Thinking about using:
+
+```dockerfile
+COPY --from=$(postgres image)
+```
+
+But postgresql isn't really just a single binary we can copy it seems. We could use `FROM index.docker.io/sourcegraph/postgres-12-alpine` as a base, but then we'd have a strict dependency between the postgres image and server, i.e. `server@abcde` requires `postgres-12-alpine@abcde` to build, but we don't have a way to ensure one is built before the other.
+This will probably work but I'm not sure it's the right way to go.
+
+@DURATION=3h
+
 ## 2022-06-13
 
 @jhchabran We saw a [strange failure](https://buildkite.com/sourcegraph/sourcegraph/builds/154191#01815d66-41f0-46a8-9ebf-10e4806cba3a/114-142}) while building Docker images: 
