@@ -71,6 +71,8 @@ COPY --from=$(postgres image)
 But postgresql isn't really just a single binary we can copy it seems. We could use `FROM index.docker.io/sourcegraph/postgres-12-alpine` as a base, but then we'd have a strict dependency between the postgres image and server, i.e. `server@abcde` requires `postgres-12-alpine@abcde` to build, but we don't have a way to ensure one is built before the other.
 This will probably work but I'm not sure it's the right way to go.
 
+More discussion, thought not too much new information from the above at time of writing: https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1655316909723799?thread_ts=1655215416.930249&cid=C02FLQDD3TQ
+
 @DURATION=3h
 
 ## 2022-06-13
