@@ -23,7 +23,7 @@ A lot of these disks are mysterious `pvc-${uuid}` disks of various sizes, up to 
 I wrote a quick script to dump these as an interim measure (based on [`prune-pvcs.sh`](https://sourcegraph.com/github.com/sourcegraph/infrastructure/-/blob/buildkite/buildkite-git-references/prune-pvcs.sh)) - this deletes 550 disks, bringing us down to 20TB of disk usage:
 
 ```sh
-gcloud compute disks list --project sourcegraph-ci --filter='description:ns-sourcegraph' --format='value(name)' |
+gcloud compute disks list --project sourcegraph-ci --filter='description:ns-sourcegraph AND NOT users:*' --format='value(name)' |
   while read -r disk; do gcloud compute disks delete ${disk} --project sourcegraph-ci --zone us-central1-a --quiet ; done
 ```
 
