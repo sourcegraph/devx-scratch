@@ -70,9 +70,9 @@ Possible next steps:
 
 ## 2022-06-16
 
-@jhchabran Following up on the request from Security that @bobheadxi mentioned in yesterday's entry, I gave a spin out of curiosity to simply patching the package itself in the Alpine repository. I was pleased to see that it was really straightforward. 
+@jhchabran Following up on the request from Security that @bobheadxi mentioned in yesterday's entry, I gave a spin out of curiosity to simply patching the package itself in the Alpine repository. I was pleased to see that it was really straightforward.
 
-```
+```sh
 docker run -it --name alpine-sdk alpine:3.12.12
 apk add alpine-sdk 
 adduser tech 
@@ -89,7 +89,7 @@ abuild -r
 # tarballed ~/packages 
 ```
 
-```
+```sh
 docker run -it --name alpine-test-the-build alpine:3.12.12
 # get the tarball under ~ 
 apk add --allow-untrusted --repository ~/packages/main/ postgresql=12.11-r0
