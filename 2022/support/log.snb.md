@@ -65,6 +65,7 @@ Possible next steps:
 
 - Maybe we shouldn't be explicitly delete the cluster at all? Though cluster creation does seem necessary here, so it looks like this is necessary.
 - Use a more descriptive namespace: https://github.com/sourcegraph/deploy-sourcegraph/pull/4144
+- Can we get rid of these tests entirely?
 
 @DURATION=3h
 
