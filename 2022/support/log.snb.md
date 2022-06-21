@@ -2,6 +2,72 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-20
+
+@bobheadxi
+
+A bunch of things happened:
+
+1. GitHub webhooks go down, causing builds to not run
+2. Dispatcher fetches of Buildkite metrics [receives an invalid response](https://github.com/sourcegraph/infrastructure/pull/3569#discussion_r902035694), possibly caused by the above, that causes a lack of agents for several hours
+   1. Undetected! I added [a new alert rule on total agent count](https://console.cloud.google.com/monitoring/alerting/policies/7627077487159874251?folder=true&organizationId=true&project=sourcegraph-ci) to try and catch this in the future (we currently only alert on "expected dispatch duration", which requires the dispatcher to be online)
+   2. [Using our logging + sentry integration](https://github.com/sourcegraph/sourcegraph/issues/36923) might help in the future as well by reporting errors (but we need to catch panics as well)
+3. I roll back the dispatcher change, but now agents are struggling to start up. We are hitting CPU quotas, but Erik notices [we are actually hitting storage quotas](https://sourcegraph.slack.com/archives/C01N83PS4TU/p1655767262475429?thread_ts=1655763780.493669&cid=C01N83PS4TU) (over 100TB!) ([quotas page](https://console.cloud.google.com/iam-admin/quotas?referrer=search&folder=true&organizationId=true&project=sourcegraph-ci))
+
+A lot of these disks are mysterious `pvc-${uuid}` disks of various sizes, up to 200GB each, that don't seem to be in use by anything. They seem to be coming from things deployed to the default `ns-sourcegraph` namespace, as indicated by the `Description` on some of the disks, e.g. `pvc-5096b7b6-807e-4392-8f68-8305bf1c0a59`:
+
+```json
+{"kubernetes.io/created-for/pv/name":"pvc-5096b7b6-807e-4392-8f68-8305bf1c0a59","kubernetes.io/created-for/pvc/name":"data-indexed-search-0","kubernetes.io/created-for/pvc/namespace":"ns-sourcegraph","storage.gke.io/created-by":"pd.csi.storage.gke.io"}
+```
+
+I wrote a quick script to dump these as an interim measure (based on [`prune-pvcs.sh`](https://sourcegraph.com/github.com/sourcegraph/infrastructure/-/blob/buildkite/buildkite-git-references/prune-pvcs.sh)) - this deletes 550 disks, bringing us down to 20TB of disk usage:
+
+```sh
+gcloud compute disks list --project sourcegraph-ci --filter='description:ns-sourcegraph' --format='value(name)' |
+  while read -r disk; do gcloud compute disks delete ${disk} --project sourcegraph-ci --zone us-central1-a --quiet ; done
+```
+
+I'm pretty sure these disks are coming from `deploy-sourcegraph`, namely:
+
+https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/blob/tests/integration/restricted/test.sh?L47
+
+In `sourcegraph/sourcegraph`, we create a more descriptive namespace:
+
+https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/dev/ci/integration/cluster/test.sh?L12%3A72=
+
+This seems to have happened before: https://github.com/sourcegraph/deploy-sourcegraph/pull/4086, and the created disks are after the introduction of this change.
+
+However, mysteriously we see that the script seems to be working as expected ([example](https://buildkite.com/sourcegraph/deploy-sourcegraph/builds/26065#01818388-3009-4394-9217-1c5969102d6f/235-489)):
+
+```none
++ CLEANUP='kill 11345; rm -rf generated-cluster; kubectl delete namespace ns-sourcegraph --timeout=180s; gcloud container clusters delete ds-test-restricted-01818362 --zone us-central1-a --project sourcegraph-ci --quiet; '
++ kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080
++ sleep 2
++ curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
+curl: (7) Failed to connect to localhost port 30080: Connection refused
++ bash -c 'kill 11345; rm -rf generated-cluster; kubectl delete namespace ns-sourcegraph --timeout=180s; gcloud container clusters delete ds-test-restricted-01818362 --zone us-central1-a --project sourcegraph-ci --quiet; '
+namespace "ns-sourcegraph" deleted
+```
+
+Notably, we see that `CLEANUP` is correctly set to what seems to be a reasonable cleanup process, and the namespace gtets appropriately deleted. This should remove any PVCs, which should prompt GKE to delete the associated disks - this is what we do in `sourcegraph-sourcegraph` as well, and its addition is described in https://github.com/sourcegraph/deploy-sourcegraph/pull/4086:
+
+https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/dev/ci/integration/cluster/test.sh?L27%3A1-31%3A2=
+
+However, there we *don't* delete the cluster with `gcloud container clusters delete`. [In the docs](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete) it's noted (emphasis mine):
+
+> GKE will attempt to delete the following resources. **Deletion of these resources is not always guaranteed**:
+>
+> - External load balancers created by the cluster
+> - Internal load balancers created by the cluster
+> - **Persistent disk volumes**
+
+Possible next steps:
+
+- Maybe we shouldn't be explicitly delete the cluster at all? Though cluster creation does seem necessary here, so it looks like this is necessary.
+- Use a more descriptive namespace: https://github.com/sourcegraph/deploy-sourcegraph/pull/4144
+
+@DURATION=3h
+
 ## 2022-06-16
 
 @jhchabran Following up on the request from Security that @bobheadxi mentioned in yesterday's entry, I gave a spin out of curiosity to simply patching the package itself in the Alpine repository. I was pleased to see that it was really straightforward. 
