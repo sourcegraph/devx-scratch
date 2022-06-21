@@ -29,11 +29,11 @@ gcloud compute disks list --project sourcegraph-ci --filter='description:ns-sour
 
 I'm pretty sure these disks are coming from `deploy-sourcegraph`, namely:
 
-https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/blob/tests/integration/restricted/test.sh?L47
+https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph@683e455055d753a684302cdb98783cb255316709/-/blob/tests/integration/restricted/test.sh?L47
 
 In `sourcegraph/sourcegraph`, we create a more descriptive namespace:
 
-https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/dev/ci/integration/cluster/test.sh?L12%3A72=
+https://sourcegraph.com/github.com/sourcegraph/sourcegraph@3913ffdfb5acfac8319f59c556b54f05a0f4ca27/-/blob/dev/ci/integration/cluster/test.sh?L12:72=
 
 This seems to have happened before: https://github.com/sourcegraph/deploy-sourcegraph/pull/4086, and the created disks are after the introduction of this change.
 
@@ -51,7 +51,7 @@ namespace "ns-sourcegraph" deleted
 
 Notably, we see that `CLEANUP` is correctly set to what seems to be a reasonable cleanup process, and the namespace gtets appropriately deleted. This should remove any PVCs, which should prompt GKE to delete the associated disks - this is what we do in `sourcegraph-sourcegraph` as well, and its addition is described in https://github.com/sourcegraph/deploy-sourcegraph/pull/4086:
 
-https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/dev/ci/integration/cluster/test.sh?L27%3A1-31%3A2=
+https://sourcegraph.com/github.com/sourcegraph/sourcegraph@3913ffdfb5acfac8319f59c556b54f05a0f4ca27/-/blob/dev/ci/integration/cluster/test.sh?L27:1-31:2=
 
 However, there we *don't* delete the cluster with `gcloud container clusters delete`. [In the docs](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete) it's noted (emphasis mine):
 
