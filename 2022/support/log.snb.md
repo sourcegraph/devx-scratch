@@ -6,6 +6,10 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 @jhchabran
 
+Valery reported that there is some CI infra issue with `Gulp`. Investigated and filed https://github.com/sourcegraph/sourcegraph/issues/37548 which should be a really quick fix. Ping the relevant teams and individuals, so they can fix it on their own.
+
+--- 
+
 The `Directory renamed before its status could be extracted` is [back again](https://buildkite.com/sourcegraph/sourcegraph/builds/155788#018187cb-9d4e-4a86-8785-50ff844a05e4/153-157). A Grafana search in the logs with the query `{app="buildkite"} |= "Directory renamed before its status could be extracted"` shows that it started happening again yesterday, but hasn't happened yet today. 
 
 ```sourcegraph
