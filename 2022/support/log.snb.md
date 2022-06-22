@@ -6,6 +6,16 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 @jhchabran
 
+The `Directory renamed before its status could be extracted` is [back again](https://buildkite.com/sourcegraph/sourcegraph/builds/155788#018187cb-9d4e-4a86-8785-50ff844a05e4/153-157). A Grafana search in the logs with the query `{app="buildkite"} |= "Directory renamed before its status could be extracted"` shows that it started happening again yesterday, but hasn't happened yet today. 
+
+```sourcegraph
+context:@sourcegraph/all repo:^github\.com/sourcegraph/sourcegraph$ file:^enterprise/dev/ci/internal/buildkite/cache\.go cachePluginName  patternType:literal
+``` 
+
+Shows that we're still using the fork with `bsdtar`, so again, no explanation yet about why happened.
+
+---
+
 [Failure on client jobs involving the cache](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1655890023860649): https://buildkite.com/sourcegraph/sourcegraph/builds/155910#01818aa0-ddfb-4aa4-a5f4-ba7ae11a2a7f/137-150
 
 ```
