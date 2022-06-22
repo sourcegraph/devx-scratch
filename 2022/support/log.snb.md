@@ -2,6 +2,21 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-22 
+
+@jhchabran
+
+[Failure on client jobs involving the cache](https://sourcegraph.slack.com/archives/C02FLQDD3TQ/p1655890023860649): https://buildkite.com/sourcegraph/sourcegraph/builds/155910#01818aa0-ddfb-4aa4-a5f4-ba7ae11a2a7f/137-150
+
+```
+>[node_modules] - 🔥 Cache hit: s3://sourcegraph_buildkite_cache/sourcegraph/sourcegraph/cache-node_modules-3f21cee23df6eba8d19bc1da7c6176d16f8a859e.tar
+download failed: s3://sourcegraph_buildkite_cache/sourcegraph/sourcegraph/cache-node_modules-3f21cee23df6eba8d19bc1da7c6176d16f8a859e.tar to ./cache-node_modules-3f21cee23df6eba8d19bc1da7c6176d16f8a859e.tar An error occurred (InvalidRange) when calling the GetObject operation: The requested range cannot be satisfied.
+```
+
+Quick Google search showed that `InvalidRange` is an API error on GCP end.  As for the `MODULE_NOT_FOUND`, no idea so far what caused it. But its proximity with the api errors makes it quite suspect. 
+
+As it only happened [3 times, and only today](https://bit.ly/3NkjR8Y) let's just keep monitoring this for now.
+
 ## 2022-06-20
 
 @bobheadxi
