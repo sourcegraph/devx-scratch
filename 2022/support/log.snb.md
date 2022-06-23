@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-06-23 
+
+@jhchabran Wired Dogfood with its Sentry project, as asked by Camden. I capped the projet to 30 errors per hour to avoid blowing away the quotas.
+
 ## 2022-06-22 
 
 @jhchabran
