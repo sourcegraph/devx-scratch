@@ -1,4 +1,6 @@
-# Queries Examples
+# Sourcegraph cookbook
+
+Fancy tips and tricks from the DevX team when using Sourcegraph!
 
 ## Finding _when_ a file got deleted
 
