@@ -5,6 +5,12 @@ DevX teammates hacking on Sourcegraph's observability libraries and tooling, bot
 To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-06-28 Sentry notes
+
+@jhchabran
+
+While taking a look at our Sentry backlog, I noticed that GitServer is kinda light on its use of logging scopes. Opened a [very small PR as a draft](https://github.com/sourcegraph/sourcegraph/pull/37830) to bring this forward to the team as a low prio item. 
+
 ## 2022-06-23 OpenTelemetry trace export exploration
 
 @bobheadxi
