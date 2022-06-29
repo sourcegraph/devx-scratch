@@ -4,3 +4,6 @@ Log for DevOps tasks handled by DevX teammates, old and new.
 To add an entry, just add an H2 header with ISO 8601 format.
 The first line should be a list of everyone involved in the entry.
 For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
+
+## 22-06-29 Dotcom crashed due to invalid site config
+Opened a [PR](https://github.com/sourcegraph/deploy-sourcegraph-cloud/pull/17063) addressing invalid JSON and YAML that gets committed and deployed. In this case, it led to brief interruptions of sourcegraph.com. 
