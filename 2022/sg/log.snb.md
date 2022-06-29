@@ -4,6 +4,20 @@ DevX teammates hacking on `sg` log. To add an entry, just add an H2 header start
 **This log should be in reverse chronological order.**
 
 ## 2022-06-13
+- ## 2022-06-29
+
+@burmudar I've been going round and round with the markdown diff rendering. First it was rendering ok as an annotation but then on the buildkite job output we saw a bunch of terminal escape codes. So I fixed that by not rendering terminal output as markdown again. Simultaneously, I was also doing the printing of annotations when you do `sg ci status`, which was coincidentally also how I noticed this problem in the beginning. I thought the diff rendering was fixed but once the annotation work landed in main and I tried it out ... the diff rendering problem just got shifted to a new place!
+
+So the diff was rendering right on:
+
+* buildkite job output
+* buildkite annotation output
+
+Even though the annotation was rendering ok on the buildkite UI it wasn't on the terminal once you did `sg ci status`. It was rendering what looked like markdown but with a bunch of terminal escape codes. I couldn't understand this initially since I thought (mistakenly) that the markdown was being produced by sg with `WriteMarkdown` and `WriteCode`. After loads of testing, it dawned on me. `WriteMarkdown` and `WriteCode` do not produce markdown source! They RENDER markdown! Now this started making a lot more sense as to why we were getting all those terminal escape codes on our annotation! The fix now seemed a bit more obvious that before.
+
+Previously, `gogenerate` would write the diff output with `WriteCode(output, "diff")` which would produce a nice coloured diff. We could achieve the same affect by adding the cli option `--color=always`. This has two positive affects (1) we still get a coloured diff (2) the `gogenerate` method now only has to write it's terminal output to the screen with no additional parsing / escaping. Therefore, a gogenerate callee will now get the same as `git diff --colour=always` where previously the would've gotten a coloured diff interpreted by markdown. I think removing the markdown interpretation of a diff makes sense, since it's up to the callee of gogenerate if the output needs to be altered / rendered differently. I was true to a degree before, but now printing the output unaltered it's definitely true.
+
+- ## 2022-06-13
 
 @burmudar I've been implementing a feedback command on sg and I've encountered some  unexpected weirdness/complexity
 
