@@ -5,6 +5,36 @@ DevX teammates hacking on Sourcegraph's observability libraries and tooling, bot
 To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-06-29 OpenTelemetry trace export exploration
+
+@bobheadxi
+
+https://github.com/sourcegraph/sourcegraph/issues/27386
+
+- `internal/trace.Tracer` seems duplicative of `internal/tracer` (or vice versa)
+- `internal/trace/ot` is a mish-mash of trace policy and OT-specific logic
+- Turns out we have lots of code using `internal/trace/ot` directly to start traces, rather than `internal/trace` which wraps the latter
+
+Example migration:
+
+https://sourcegraph.com/search?q=context:global+repo:%5Egithub%5C.com/sourcegraph/sourcegraph%24+ot.StartSpanFromContext%28:%5Bargs%5D%29&patternType=structural
+
+Good news: a package exists that might be able to bridge OpenTracing with OpenTelemetry, https://pkg.go.dev/go.opentelemetry.io/otel/bridge/opentracing
+
+Bad news: we need to consolidate how tracers are set up.
+
+In the meantime, opened some quick PRs for cleanup:
+
+- [internal/trace: extract trace policy to OT-agnostic package](https://github.com/sourcegraph/sourcegraph/pull/37962)
+- [internal/trace: reduce direct usages of OpenTracing](https://github.com/sourcegraph/sourcegraph/pull/37963)
+
+The big refactor PR to reduce direct usages just does some nifty Comby replace, as well as a bit of manual fixing:
+
+```sh
+comby 'ot.StartSpanFromContext(:[args])' 'trace.New(:[args], "")' .go -in-place
+goimports -w .
+```
+
 ## 2022-06-28 Sentry notes
 
 @jhchabran
