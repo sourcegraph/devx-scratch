@@ -35,6 +35,8 @@ comby 'ot.StartSpanFromContext(:[args])' 'trace.New(:[args], "")' .go -in-place
 goimports -w .
 ```
 
+Update - it turns out the above is not that simple, and direct usages of OpenTracing is actually incompatible with `internal/trace`. I reverted the second PR above in https://github.com/sourcegraph/sourcegraph/pull/37979 , and in the interest of focusing on codeintel as outlined in https://github.com/sourcegraph/sourcegraph/issues/37778 I'm going to give up efforts on `internal/trace` and focus on our tracer implementations (`internal/trace.Tracer` and `internal/tracer`) to leverage the OTel bridge: https://pkg.go.dev/go.opentelemetry.io/otel/bridge/opentracing - this should cover most codeintel stuff, which uses `internal/observation` (which, in turn, uses all the above).
+
 ## 2022-06-28 Sentry notes
 
 @jhchabran
