@@ -6,7 +6,7 @@ DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 
 
 @jhchabran 
 
-The decision with Nate has been taken, it-tech-ops will deal with GitHub membership requests for the time being, but will stay out of the Github-owners handle. I'll create an ADR for this.
+The decision with Nate has been taken, it-tech-ops will deal with GitHub membership requests for the time being, but will stay out of the Github-owners handle. 
 
 ## 2022-06-23 
 
