@@ -5,6 +5,12 @@ DevX teammates hacking on Sourcegraph's observability libraries and tooling, bot
 To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
+## 2022-06-30 Possibly connected initiative in repo-mgmt 
+
+Alex Ostrikov reached me out this morning with a simple question around the ability to export logs through an API, in the context of this [initiative to build a 1-click exporter](https://github.com/sourcegraph/sourcegraph/discussions/37930). 
+We had a casual conversation that I then ported it in their GitHub discussion in [that comment](https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3055172). I proposed them that we reach them out once we have some otel collector 
+so they can run some experiment on their own.
+
 ## 2022-06-29 OpenTelemetry trace export exploration
 
 @bobheadxi
