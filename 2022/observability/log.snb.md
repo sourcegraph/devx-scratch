@@ -41,6 +41,15 @@ https://sourcegraph.com/github.com/sourcegraph/sourcegraph@652f77c01967d979237e8
 
 I reverted the second PR above in https://github.com/sourcegraph/sourcegraph/pull/37979 , and in the interest of focusing on codeintel as outlined in https://github.com/sourcegraph/sourcegraph/issues/37778 I'm going to give up efforts on `internal/trace` and focus on our tracer implementations (`internal/trace.Tracer` and `internal/tracer`) to leverage the OTel bridge: https://pkg.go.dev/go.opentelemetry.io/otel/bridge/opentracing - this should cover most codeintel stuff, which uses `internal/observation` (which, in turn, uses all the above).
 
+I went back, banged my head on this a bit more, and I think I understand how this works better now and how to hook into everything correctly: https://github.com/sourcegraph/sourcegraph/pull/37984 - how this works:
+
+1. `internal/tracer.Init()` -> sets a `switchableTracer` to `opentracing.GlobalTracer()`
+2. Everyone else uses `opentracing.GlobalTracer` -> `switchableTracer`
+3. We hot-swap the `opentracing.Tracer` _inside_ `switchableTracer` with whatever is in site config
+4. Instead of using our default OpenTracing tracer, Jaeger, we now slot in an OpenTelemetry tracer bridged using the previously mentioned OpenTracing bridge library that sends stuff to an OpenTelemetry collector.
+
+Will test all this tomorrow.
+
 ## 2022-06-28 Sentry notes
 
 @jhchabran
