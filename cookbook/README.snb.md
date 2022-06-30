@@ -19,5 +19,5 @@ Here we can see that the first result, mentions a commit from _Quinn Slack_ that
 Let's say we're bumping the minimum version of a module, because now we're using generics. We probably want to see what go version the modules importing our library are using in the wild:
 
 ```sourcegraph
-context:@sourcegraph file:go.mod go 1.:[~\d+] :[_] require (:[_]github.com/sourcegraph/log :[_]) patternType:structural
+context:@sourcegraph file:go.mod file:go\.mod$ go\s*(\d\.\d+) and github.com/sourcegraph/log patternType:regexp
 ```
