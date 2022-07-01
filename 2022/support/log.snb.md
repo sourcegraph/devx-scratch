@@ -2,6 +2,12 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-07-01
+
+@jhchabran
+
+A [test opsgenie alert](https://opsg.in/a/i/sourcegraph/3c603aeb-a223-4b41-a4a4-94d7467dba7d-1656692903240) was sent (don't know from where it comes from). OpsGenie integration was sent over #dev-experience which is kinda noisy and not the right place. I moved it to #dev-experience-internal instead.
+
 ## 2022-06-30 
 
 @jhchabran 
