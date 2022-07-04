@@ -5,7 +5,7 @@ To add an entry, just add an H2 header with ISO 8601 format.
 The first line should be a list of everyone involved in the entry.
 For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
-## 22-06-29 GCP Cost Reduction and CD improvements
+## 2022-07-04 GCP Cost Reduction and CD improvements
 
 @kalanchan
 
@@ -23,7 +23,7 @@ Regarding GCP cost reductions, we'll tackle the low hanging fruit first identifi
 - build foundations for FinOps. [FinOps is to Dollars What DevOps is to Code](https://devops.com/how-finops-can-optimize-cloud-costs-and-drive-innovation/)
 - [eventual "observability" into cloud cost](https://cloud.google.com/blog/topics/developers-practitioners/optimizing-your-google-cloud-spend-bigquery-and-looker)
 
-## 22-06-29 Dotcom crashed due to invalid site config
+## 2022-07-04 Dotcom crashed due to invalid site config
 
 @sanderginn
 
