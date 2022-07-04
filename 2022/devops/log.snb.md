@@ -5,6 +5,24 @@ To add an entry, just add an H2 header with ISO 8601 format.
 The first line should be a list of everyone involved in the entry.
 For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-07-04 deploy-sourcegraph-cloud renovate scheduling
+
+@bobheadxi
+
+It was noted that Grafana and Prometheus have not been updated in several weeks.
+I think the main issue is that the schedule was provided in a crontab format, when [Renovate scheduling docs make no indication it supports crontab](https://docs.renovatebot.com/key-concepts/scheduling/) - the syntax seems documented here: https://breejs.github.io/later/parsers.html#text
+
+I decided to just push directly to the preprod branch with some fixes (pull requests are a nightmare to merge): https://github.com/sourcegraph/deploy-sourcegraph-cloud/pull/17105/commits/24f9d5efb82d81a2a307b2a2b5ff4c9b2a33d38e , tl;dr
+
+```diff
+-     schedule: ["* 15 * * 1-5"],
++     schedule: ["after 3pm on monday"],
+```
+
+It also seems the schedule has changed - what used to by "Daily" is actually weekly, and so on, so I've updated the names of the Renvoate jobs as well. I then manually bumped Prometheus and Grafana to `158142_2022-07-04_0ce424594726` by hand in pre-prod.
+
+All this will be merged in https://github.com/sourcegraph/deploy-sourcegraph-cloud/pull/17105
+
 ## 2022-07-04 GCP Cost Reduction and CD improvements
 
 @kalanchan
