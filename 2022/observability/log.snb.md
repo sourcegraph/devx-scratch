@@ -5,12 +5,6 @@ DevX teammates hacking on Sourcegraph's observability libraries and tooling, bot
 To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
-## 2022-06-30 Possibly connected initiative in repo-mgmt 
-
-Alex Ostrikov reached me out this morning with a simple question around the ability to export logs through an API, in the context of this [initiative to build a 1-click exporter](https://github.com/sourcegraph/sourcegraph/discussions/37930). 
-We had a casual conversation that I then ported it in their GitHub discussion in [that comment](https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3055172). I proposed them that we reach them out once we have some otel collector 
-so they can run some experiment on their own.
-
 ## 2022-07-04 Safe logging
 
 @bobheadxi
@@ -86,6 +80,16 @@ Problems:
 Additionally, there are other patterns where pointer types are threaded extensively throughout the codebase, namely `database.DB`, and we get away with that fine, so the `log.Logger` pattern might continue to be acceptable:
 
 https://sourcegraph.com/search?q=context:global+repo:%5Egithub%5C.com/sourcegraph/sourcegraph%24+database.DB
+
+## 2022-06-30 Possibly connected initiative in repo-management
+
+@jhchabran
+
+Alex Ostrikov reached me out this morning with a simple question around the ability to export logs through an API, in the context of this [initiative to build a 1-click exporter](https://github.com/sourcegraph/sourcegraph/discussions/37930).
+We had a casual conversation that I then ported it in their GitHub discussion in [that comment](https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3055172). I proposed them that we reach them out once we have some otel collector
+so they can run some experiment on their own.
+
+@bobheadxi also left some comments (e.g. https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3081875 and https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3075562)
 
 ## 2022-06-29 OpenTelemetry trace export exploration
 
