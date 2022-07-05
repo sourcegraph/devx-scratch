@@ -2,6 +2,44 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-07-05
+
+@jhchabran Valery reported that some agents are not firing up, leading to build being stuck. A quick check showed that only 31 agents are available. 
+
+Many agents are stuck in "container creating" or "pending" state, for about 3h with the following log message:
+
+```
+stream logs failed container "dind" in pod "buildkite-agent-stateless-3d11562a88f44d6c83f91422a358bad3cksqj" is waiting to start: ContainerCreating for buildkite/buildkite-agent-stateless-3d11562a88f44d6c83f91422a358bad3cksqj (dind)                                                                                                                 stream logs failed container "buildkite-agent-stateless" in pod "buildkite-agent-stateless-3d11562a88f44d6c83f91422a358bad3cksqj" is waiting to start: ContainerCreating for buildkite/buildkite-agent-stateless-3d11562a88f44d6c83f91422a358bad3cksqj (buildkite-agent-stateless)
+```
+
+```
+Normal   NotTriggerScaleUp  3m12s                cluster-autoscaler  pod didn't trigger scale-up: 6 node(s) had volume node affinity conflict, 2 in backoff after failed scale-up 
+
+Warning  FailedScheduling   64s (x9 over 3m25s)  default-scheduler   0/133 nodes are available: 1 node(s) had taint {node.kubernetes.io/disk-pressure: }, that the pod didn't tolerate, 130 Insufficient cpu, 2 Insufficient memory, 2 node(s) had volume node affinity conflict.
+
+Warning  FailedScheduling   6s (x7 over 2m35s)   default-scheduler   0/133 nodes are available: 129 Insufficient cpu, 2 Insufficient memory, 2 node(s) had taint {node.kubernetes.io/disk-pressure: }, that the pod didn't tolerate, 2 node(s) had volume node affinity conflict.
+```
+
+After investigating further with Sanders, we noticed that a GKE updated was automatically applied. We went from 1.21 to 1.22, which had the unexpected side effect of breaking the `buildkite-git-references` volumes. This resulted in agents being stuck in `pending` or `containerCreating` and [exhausted all the disk quota](https://console.cloud.google.com/iam-admin/quotas?referrer=search&project=sourcegraph-ci).
+
+```
+Node scale up in zones us-central1-c associated with this pod failed: GCE quota exceeded. Pod is at risk of not being scheduled
+```
+
+After killing all jobs to release the resources, we scaled down the total agent count, because the current size for the agent base disks times 250 is greater than the allocated quota. 
+
+Still, we a big problem remained, even though we were able to get agent scheduled, they were still stuck as they were failing to mount the `buildkite-git-references` volume. 
+
+We tried creating a new one manually, which didn't fix the problem. After digging further, noticing that only a single agent at a time could mount the volume, whereas it's expected that it can be mounted by many, we started investigating how the upgrade could have affected this. 
+
+The `buildkite-git-references` volumes have two access modes, `RWO` and `ROX`. The former, being used by the populating job and the latter by the agents themselves. Digging in [the docs showed us](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/readonlymany-disks#volume-snapshot) that this not how it's supposed to be done. 
+
+Following the above guide didn't work, as we kept getting `multiattach` errors on containers creation. We wrongly assumed that the [persistent disk CSI driver](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/gce-pd-csi-driver) was [already enabled as our TF indicates](https://sourcegraph.com/github.com/sourcegraph/infrastructure/-/blob/buildkite/gke.tf?L38), which wasn't the case.
+
+Fixing this, we still could not get the approach with a PV/PVC for the `RWO` access and one for `ROX` to work with the `datasource` approach recommend by the docs. We instead found a [SO post](https://stackoverflow.com/questions/64128047/migrating-rom-rwo-persistent-volume-claims-from-in-tree-plugin-to-csi-in-gke) which gave a more manual approach that worked, see [the final PR](https://github.com/sourcegraph/infrastructure/pull/3616).
+
+In retrospective, the next time we see a k8s update, we should instantly TF apply. But eh, that was the first time I've seen this so, lesson learned the hard way. Will take some time later to devise follow-up actions.
+
 ## 2022-07-01
 
 @jhchabran
