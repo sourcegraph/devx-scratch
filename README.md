@@ -5,7 +5,7 @@ Experiments and notes from the [Sourcegraph Dev Experience team](https://handboo
 [Browse our notebooks on sourcegraph.com!](https://sourcegraph.com/github.com/sourcegraph/devx-scratch@main/-/blob/README.md)
 
 - [Cookbook](./cookbook/README.snb.md)
-- [2022](./2022/README.md)
+- [2022](./2022/README.snb.md)
 
 ## Further reading
 
