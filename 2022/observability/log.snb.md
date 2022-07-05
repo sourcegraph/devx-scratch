@@ -11,6 +11,82 @@ Alex Ostrikov reached me out this morning with a simple question around the abil
 We had a casual conversation that I then ported it in their GitHub discussion in [that comment](https://github.com/sourcegraph/sourcegraph/discussions/37930#discussioncomment-3055172). I proposed them that we reach them out once we have some otel collector 
 so they can run some experiment on their own.
 
+## 2022-07-04 Safe logging
+
+@bobheadxi
+
+Consider the following:
+
+```go
+type Data struct {
+    log log.Logger // interface
+    // ...
+}
+
+func (d *Data) Foobar() { d.log.Debug("foobar") }
+```
+
+Because [`log.Logger` is a pointer type (interface)](https://sourcegraph.com/github.com/sourcegraph/log/-/blob/logger.go), improper instantiation of `Data` can be fatal since the zero value of the field will be nil, as happened in https://github.com/sourcegraph/sourcegraph/pull/36457 and https://github.com/sourcegraph/sourcegraph/pull/38185.
+I considered the possibility of introducing a "safe zero type" version of `log.Logger`, that one could use like so:
+
+```go
+type Data struct {
+    log log.SafeLogger // value type
+    // ...
+}
+
+func (d *Data) Foobar() { d.log.Debug("foobar") } // safe
+```
+
+Sketch:
+
+```go
+// SafeLogger is a Logger that is safe for use as a zero value.
+type SafeLogger struct {
+    Scope       string
+    Description string
+
+    // logger is the underlying Logger instance instantiated with From.
+    logger Logger
+    // loggerOnce must be a pointer because sync.Once should never be copied.
+    loggerOnce *sync.Once
+}
+
+var _ Logger = SafeLogger{}
+
+// From instantiates SafeLogger explicitly from a parent logger.
+func (s SafeLogger) From(logger Logger) Logger {
+    if s.loggerOnce == nil {
+        s.loggerOnce = &sync.Once{}
+    }
+    s.loggerOnce.Do(func() {
+        if logger == nil {
+            // Create a new top-level logger
+            s.logger = Scoped(s.Scope, s.Description)
+        }
+        s.logger = logger.Scoped(s.Scope, s.Description)
+    })
+    return s.logger
+}
+
+// Concretely implement log.Logger
+
+func (s SafeLogger) Scoped(scope string, description string) Logger {
+    return s.From(nil).Scoped(scope, description)
+}
+
+// ...etc
+```
+
+Problems:
+
+- effectively the same as always using a new global logger (`log.Scoped`)
+- if you rely on `SafeLogger`'s zero value, you might never set `Scope` and `Description`, leading to poorly scoped loggers
+
+Additionally, there are other patterns where pointer types are threaded extensively throughout the codebase, namely `database.DB`, and we get away with that fine, so the `log.Logger` pattern might continue to be acceptable:
+
+https://sourcegraph.com/search?q=context:global+repo:%5Egithub%5C.com/sourcegraph/sourcegraph%24+database.DB
+
 ## 2022-06-29 OpenTelemetry trace export exploration
 
 @bobheadxi
