@@ -3,8 +3,7 @@
 DevX teammates hacking on `sg` log. To add an entry, just add an H2 header starting with the ISO 8601 format, a topic.
 **This log should be in reverse chronological order.**
 
-## 2022-06-13
-- ## 2022-06-29
+## 2022-06-29
 
 @burmudar I've been going round and round with the markdown diff rendering. First it was rendering ok as an annotation but then on the buildkite job output we saw a bunch of terminal escape codes. So I fixed that by not rendering terminal output as markdown again. Simultaneously, I was also doing the printing of annotations when you do `sg ci status`, which was coincidentally also how I noticed this problem in the beginning. I thought the diff rendering was fixed but once the annotation work landed in main and I tried it out ... the diff rendering problem just got shifted to a new place!
 
@@ -17,7 +16,7 @@ Even though the annotation was rendering ok on the buildkite UI it wasn't on the
 
 Previously, `gogenerate` would write the diff output with `WriteCode(output, "diff")` which would produce a nice coloured diff. We could achieve the same effect by adding the cli option `--color=always`. This has two positive affects (1) we still get a coloured diff (2) the `gogenerate` method now only has to write it's terminal output to the screen with no additional parsing / escaping. Therefore, a gogenerate callee will now get the same output as `git diff --colour=always` where previously they would've gotten a coloured diff interpreted by markdown. I think removing the markdown interpretation of a diff makes sense, since it's up to the callee of gogenerate if the output needs to be altered / rendered differently. It was true to a degree before, that the callee could decide to render things differently, but now it is slightly MORE true!
 
-- ## 2022-06-13
+## 2022-06-13
 
 @burmudar I've been implementing a feedback command on sg and I've encountered some  unexpected weirdness/complexity
 
