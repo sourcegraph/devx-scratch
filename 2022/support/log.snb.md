@@ -2,6 +2,26 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-07-06
+
+@jhchabran Guess how happy I was this morning to see that we went back to 13 agents and they were all stuck haha!
+
+Two things happened. I forgot to merge the fixing PR last evening when I came back in the evening. And the other one is that apparently, and I have no idea why, but this was missing from the ROX pvc manifest: 
+
+```
+M buildkite/buildkite-git-references/PersistentVolumeROX.template.yaml
+@@ -18,6 +18,7 @@ spec:
+     fsType: ext4
+     # Create this disk with gcloud
+     pdName: buildkite-git-references-$BUILDKITE_BUILD_NUMBER # interpolate this value
++    readOnly: true
+   capacity:
+     storage: 16G
+   persistentVolumeReclaimPolicy: Delete
+```
+
+Once this has been applied, agents started working again, being able to concurrently mount the git ref PVC. Phew.
+
 ## 2022-07-05
 
 @jhchabran Valery reported that some agents are not firing up, leading to build being stuck. A quick check showed that only 31 agents are available. 
