@@ -4,6 +4,13 @@ DevX teammates hacking on `sg` log. To add an entry, just add an H2 header start
 **This log should be in reverse chronological order.**
 
 ## 2022-06-29
+- ## 2022-07-07
+
+@burmudar I've been investigating why Backcompat tests annotations are not rendering properly. Recently, we changed the rendering slightly to include a Grafana link and try as one might, it just isn't rendering. For context, the Backcompat tests are kicked off by `dev/ci/go-backcompat/test.sh`, which in a nutshell **checks out an older version of the code** and runs tests to check for backwards compatibility. A slight gotcha with this is, since an older revision is checked out, it means older ci scripts are checked out too! I double checked the md5 sums of the `annotate.sh` script to confirm that yes, it does run an older version of the scripts and after reflecting on it, it does make sense why that happens.
+
+We might want to in the future want to bring ci things into the `sg` binary which gets built and then ci uses that binary everywhere. What happens when we make a backwards incompatible change in `sg`? At least now, when the backcompat tests checkout an older version the ci scripts will also be at the same version and be guaranteed to work with that version... A problem for another day perhaps.
+
+- ## 2022-06-29
 
 @burmudar I've been going round and round with the markdown diff rendering. First it was rendering ok as an annotation but then on the buildkite job output we saw a bunch of terminal escape codes. So I fixed that by not rendering terminal output as markdown again. Simultaneously, I was also doing the printing of annotations when you do `sg ci status`, which was coincidentally also how I noticed this problem in the beginning. I thought the diff rendering was fixed but once the annotation work landed in main and I tried it out ... the diff rendering problem just got shifted to a new place!
 
