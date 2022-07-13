@@ -2,6 +2,10 @@
 
 DevX support rotation log. To add an entry, just add an H2 header with ISO 8601 format. The first line should be a list of everyone involved in the entry. For ease of use and handing over issues, **this log should be in reverse chronological order**, with the most recent entry at the top.
 
+## 2022-07-13 
+
+@jhchabran I've added two new how-tos, covering how to deal with custom step notifications and soft failures: https://github.com/sourcegraph/sourcegraph/pull/38718
+
 ## 2022-07-06
 
 @jhchabran Guess how happy I was this morning to see that we went back to 13 agents and they were all stuck haha!
