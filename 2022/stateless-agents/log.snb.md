@@ -2,6 +2,21 @@
 
 Notes on https://github.com/sourcegraph/sourcegraph/issues/30233. **This log should be in reverse chronological order.**
 
+## 2022-07-18 
+
+@jhchabran and @burmudar
+
+In a moment of CI anger, we decided to investigate speeding up the CI. We tested three different approaches:
+
+- Using `--cache-from` on the server images. 
+  - Inconclusive, yields practically zero results. 
+- Caching the `$GOPATH`, to avoid rebuilding everything on every go step. 
+  - Very marginal results, null when compared to the variance across those steps (+/- 30s)
+- Caching the client bundle on the server image
+  - https://github.com/sourcegraph/sourcegraph/pull/38940, halves the `server` candidate image build step :feelsgood:
+  - We're waiting on the FP team to tell us if that approach is broken or not.
+  - https://sourcegraph.slack.com/archives/C01N83PS4TU/p1658156123106499
+
 ## 2022-07-07
 
 @bobheadxi
